@@ -23,12 +23,23 @@ export function AuthRecoveryListener() {
     // chega, antes do Supabase processar o token), já manda pra tela
     // certa. Isso cobre o caso de o evento PASSWORD_RECOVERY disparar
     // antes deste componente terminar de montar.
-    if (
-      typeof window !== "undefined" &&
-      window.location.hash.includes("type=recovery") &&
-      window.location.pathname !== "/definir-senha"
-    ) {
-      router.replace("/definir-senha" + window.location.hash);
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+
+      if (hash.includes("type=recovery") && window.location.pathname !== "/definir-senha") {
+        router.replace("/definir-senha" + hash);
+      } else if (hash.includes("error=") || hash.includes("error_code=")) {
+        // O link chegou, mas o Supabase recusou o token (expirado, já
+        // usado, etc). Isso também vem escondido depois do "#", que só
+        // o navegador consegue ler — por isso extraímos a mensagem
+        // aqui e mandamos como texto normal pra tela de login, em vez
+        // de deixar a pessoa numa tela de login em branco sem
+        // explicação nenhuma.
+        const parsed = new URLSearchParams(hash.replace(/^#/, ""));
+        const mensagem =
+          parsed.get("error_description") || parsed.get("error_code") || "link inválido ou expirado";
+        router.replace("/login?erro=" + encodeURIComponent(mensagem.replace(/\+/g, " ")));
+      }
     }
 
     const supabase = createClient();
