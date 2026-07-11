@@ -24,6 +24,14 @@ function DefinirSenhaForm() {
   const [temSessao, setTemSessao] = useState(false);
   const [verificando, setVerificando] = useState(true);
 
+  // Campos do modo "digitar o código" — usados quando o link do
+  // e-mail não funciona (ex: algum antivírus/scanner de e-mail já
+  // "visitou" o link sozinho e o consumiu antes da pessoa clicar).
+  const [email, setEmail] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [erroCodigo, setErroCodigo] = useState<string | null>(null);
+  const [verificandoCodigo, setVerificandoCodigo] = useState(false);
+
   useEffect(() => {
     if (demoMode) {
       router.replace("/dashboard");
@@ -31,14 +39,6 @@ function DefinirSenhaForm() {
     }
     const supabase = createClient();
 
-    // Se o link do e-mail trouxer um "token_hash" na própria URL (e não
-    // escondido depois de um #), a gente confirma esse código agora,
-    // aqui no navegador. Isso só roda quando o JavaScript da página
-    // realmente executa — ou seja, só quando uma pessoa de verdade abre
-    // o link, e não quando um antivírus/scanner de e-mail "visita" o
-    // link sozinho por trás dos panos (isso é bem comum em contas
-    // Gmail/Outlook corporativas e é o que estava consumindo o link
-    // antes da pessoa conseguir clicar nele).
     const tokenHash = searchParams.get("token_hash");
     const type = searchParams.get("type");
 
@@ -60,6 +60,24 @@ function DefinirSenhaForm() {
 
     verificar();
   }, [demoMode, router, searchParams]);
+
+  async function verificarCodigo(e: React.FormEvent) {
+    e.preventDefault();
+    setErroCodigo(null);
+    setVerificandoCodigo(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: codigo.trim(),
+      type: "recovery",
+    });
+    setVerificandoCodigo(false);
+    if (error) {
+      setErroCodigo("Código inválido ou expirado. Confira o e-mail mais recente e tente de novo.");
+      return;
+    }
+    setTemSessao(true);
+  }
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
@@ -106,11 +124,49 @@ function DefinirSenhaForm() {
           {verificando ? (
             <p className="text-sm text-ink/60">Verificando o link...</p>
           ) : !temSessao ? (
-            <p className="text-sm text-ink/60">
-              Este link de recuperação não é mais válido (ele expira depois de
-              usado ou após um tempo). Peça um novo e-mail de recuperação de
-              senha e clique no link mais recente.
-            </p>
+            <>
+              <p className="mb-5 text-sm text-ink/60">
+                O link não funcionou (comum quando o e-mail é escaneado
+                automaticamente antes de você clicar). Sem problema: digite
+                seu e-mail e o código de 6 dígitos que veio na mensagem.
+              </p>
+              <form onSubmit={verificarCodigo}>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                  E-mail
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="mb-4 w-full rounded-lg border border-line bg-off-white px-3 py-2 text-sm outline-none focus:border-wine"
+                  placeholder="voce@email.com"
+                />
+
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                  Código do e-mail
+                </label>
+                <input
+                  type="text"
+                  required
+                  inputMode="numeric"
+                  value={codigo}
+                  onChange={(e) => setCodigo(e.target.value)}
+                  className="mb-5 w-full rounded-lg border border-line bg-off-white px-3 py-2 text-sm tracking-[0.3em] outline-none focus:border-wine"
+                  placeholder="000000"
+                />
+
+                {erroCodigo && <p className="mb-4 text-sm text-wine">{erroCodigo}</p>}
+
+                <button
+                  type="submit"
+                  disabled={verificandoCodigo}
+                  className="w-full rounded-lg bg-wine py-2.5 text-sm font-medium text-off-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                >
+                  {verificandoCodigo ? "Verificando..." : "Verificar código"}
+                </button>
+              </form>
+            </>
           ) : sucesso ? (
             <p className="text-sm text-wine">
               Senha salva! Levando você para o painel...
