@@ -1,11 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase";
 
 export default function DefinirSenhaPage() {
+  return (
+    <Suspense fallback={null}>
+      <DefinirSenhaForm />
+    </Suspense>
+  );
+}
+
+function DefinirSenhaForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const demoMode = !isSupabaseConfigured();
   const [senha, setSenha] = useState("");
   const [confirmar, setConfirmar] = useState("");
@@ -13,6 +22,7 @@ export default function DefinirSenhaPage() {
   const [carregando, setCarregando] = useState(false);
   const [sucesso, setSucesso] = useState(false);
   const [temSessao, setTemSessao] = useState(false);
+  const [verificando, setVerificando] = useState(true);
 
   useEffect(() => {
     if (demoMode) {
@@ -20,10 +30,36 @@ export default function DefinirSenhaPage() {
       return;
     }
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
+
+    // Se o link do e-mail trouxer um "token_hash" na própria URL (e não
+    // escondido depois de um #), a gente confirma esse código agora,
+    // aqui no navegador. Isso só roda quando o JavaScript da página
+    // realmente executa — ou seja, só quando uma pessoa de verdade abre
+    // o link, e não quando um antivírus/scanner de e-mail "visita" o
+    // link sozinho por trás dos panos (isso é bem comum em contas
+    // Gmail/Outlook corporativas e é o que estava consumindo o link
+    // antes da pessoa conseguir clicar nele).
+    const tokenHash = searchParams.get("token_hash");
+    const type = searchParams.get("type");
+
+    async function verificar() {
+      if (tokenHash && type) {
+        const { error } = await supabase.auth.verifyOtp({
+          type: type as "recovery" | "email",
+          token_hash: tokenHash,
+        });
+        setTemSessao(!error);
+        setVerificando(false);
+        return;
+      }
+
+      const { data } = await supabase.auth.getSession();
       setTemSessao(Boolean(data.session));
-    });
-  }, [demoMode, router]);
+      setVerificando(false);
+    }
+
+    verificar();
+  }, [demoMode, router, searchParams]);
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
@@ -67,7 +103,9 @@ export default function DefinirSenhaPage() {
         </div>
 
         <div className="rounded-2xl border border-line bg-white/60 p-7 shadow-sm">
-          {!temSessao ? (
+          {verificando ? (
+            <p className="text-sm text-ink/60">Verificando o link...</p>
+          ) : !temSessao ? (
             <p className="text-sm text-ink/60">
               Este link de recuperação não é mais válido (ele expira depois de
               usado ou após um tempo). Peça um novo e-mail de recuperação de
