@@ -18,6 +18,19 @@ export function AuthRecoveryListener() {
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
 
+    // Verificação direta na URL: se o link que a pessoa clicou ainda
+    // traz "type=recovery" no endereço (isso acontece assim que ela
+    // chega, antes do Supabase processar o token), já manda pra tela
+    // certa. Isso cobre o caso de o evento PASSWORD_RECOVERY disparar
+    // antes deste componente terminar de montar.
+    if (
+      typeof window !== "undefined" &&
+      window.location.hash.includes("type=recovery") &&
+      window.location.pathname !== "/definir-senha"
+    ) {
+      router.replace("/definir-senha" + window.location.hash);
+    }
+
     const supabase = createClient();
     const { data: listener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
