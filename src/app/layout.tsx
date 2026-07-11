@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
+import { AuthRecoveryListener } from "@/components/AuthRecoveryListener";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -29,6 +30,7 @@ export default function RootLayout({
       className={`${playfair.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-off-white text-ink">
+        <AuthRecoveryListener />
         {children}
       </body>
     </html>
