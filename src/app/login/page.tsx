@@ -1,11 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const demoMode = !isSupabaseConfigured();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -15,8 +24,17 @@ export default function LoginPage() {
   useEffect(() => {
     if (demoMode) {
       router.replace("/dashboard");
+      return;
     }
-  }, [demoMode, router]);
+    const erroUrl = searchParams.get("erro");
+    if (erroUrl) {
+      setErro(
+        "O link que você usou não é mais válido: " +
+          erroUrl +
+          ". Peça um novo e-mail de recuperação de senha."
+      );
+    }
+  }, [demoMode, router, searchParams]);
 
   async function entrar(e: React.FormEvent) {
     e.preventDefault();
