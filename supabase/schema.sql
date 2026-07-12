@@ -22,6 +22,18 @@ create table if not exists posts (
   titulo text not null,
   legenda text default '',
   hashtags text default '',
+  roteiro text default '',
+  categoria text check (categoria in (
+    'saude_mental_bem_estar',
+    'mentalidade_sucesso',
+    'autoridade_presenca_feminina',
+    'autoestima_autoconhecimento',
+    'carreira_posicionamento',
+    'produto_promocional',
+    'marca_pessoal_branding',
+    'financas_femininas',
+    'nostalgia_comunidade'
+  )),
   tipo text not null default 'feed' check (tipo in ('feed', 'stories', 'reels', 'carrossel')),
   status text not null default 'ideia' check (status in ('ideia', 'producao', 'aprovacao', 'agendado', 'publicado')),
   data_publicacao timestamptz not null,
@@ -139,3 +151,30 @@ create policy "leitura publica das artes" on storage.objects
 
 create policy "equipe envia artes" on storage.objects
   for insert with check (bucket_id = 'artes' and auth.role() = 'authenticated');
+
+-- =========================================================================
+-- Migração: adiciona os campos "roteiro" (conteúdo do carrossel/reel) e
+-- "categoria" (assunto do conteúdo) em um banco que já existia antes
+-- dessas colunas serem criadas. Pode rodar de novo sem problema.
+-- =========================================================================
+alter table posts add column if not exists roteiro text default '';
+alter table posts add column if not exists categoria text;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'posts_categoria_check'
+  ) then
+    alter table posts add constraint posts_categoria_check check (categoria in (
+      'saude_mental_bem_estar',
+      'mentalidade_sucesso',
+      'autoridade_presenca_feminina',
+      'autoestima_autoconhecimento',
+      'carreira_posicionamento',
+      'produto_promocional',
+      'marca_pessoal_branding',
+      'financas_femininas',
+      'nostalgia_comunidade'
+    ));
+  end if;
+end $$;
