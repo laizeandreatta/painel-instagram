@@ -183,14 +183,16 @@ end $$;
 -- Migração: novas colunas do quadro Kanban. Antes tínhamos "Ideia",
 -- "Em produção", "Em aprovação", "Agendado", "Publicado" — agora ficou
 -- "Ideia", "Copy concluída", "Design concluído", "Agendado", "Postado".
--- Primeiro remapeia os posts que já existem para os novos valores,
--- depois troca a regra (constraint) que valida a coluna.
+-- Primeiro remove a regra antiga (senão os updates abaixo são barrados
+-- por ela), remapeia os posts que já existem para os novos valores, e
+-- só então recria a regra já com os novos valores permitidos.
 -- =========================================================================
+alter table posts drop constraint if exists posts_status_check;
+
 update posts set status = 'copy_concluida' where status = 'producao';
 update posts set status = 'design_concluido' where status = 'aprovacao';
 update posts set status = 'postado' where status = 'publicado';
 
-alter table posts drop constraint if exists posts_status_check;
 alter table posts add constraint posts_status_check check (status in (
   'ideia', 'copy_concluida', 'design_concluido', 'agendado', 'postado'
 ));
