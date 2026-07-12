@@ -11,7 +11,7 @@ import { createAdminClient } from "@/lib/supabaseAdmin";
  *     Instagram e salva um "retrato" na tabela seguidores_historico,
  *     para montar o gráfico de crescimento.
  *
- *  2. Para cada post com status "publicado", data de publicação há
+ *  2. Para cada post com status "postado", data de publicação há
  *     mais de 24h e que tenha um ig_media_id preenchido (colado na
  *     página do post), busca as métricas de desempenho (curtidas,
  *     comentários, alcance, impressões, salvamentos) e salva na
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
   const { data: posts } = await supabase
     .from("posts")
     .select("id, ig_media_id, tipo")
-    .eq("status", "publicado")
+    .eq("status", "postado")
     .lte("data_publicacao", vinteQuatroHorasAtras)
     .not("ig_media_id", "is", null);
 
