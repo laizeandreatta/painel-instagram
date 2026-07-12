@@ -52,12 +52,8 @@ export default function DashboardPage() {
             </button>
           </div>
           <NewPostDialog
-            onCreate={(dados) =>
-              criarPost({
-                ...dados,
-                responsavel_nome: profile?.nome ?? "Equipe",
-              })
-            }
+            responsavelPadrao={profile?.nome ?? ""}
+            onCreate={(dados) => criarPost(dados)}
           />
         </div>
       </div>
