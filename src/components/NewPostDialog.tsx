@@ -11,12 +11,16 @@ import {
   PostType,
   TIPO_LABELS,
 } from "@/lib/types";
+import { useTeam } from "@/lib/useTeam";
 
 export function NewPostDialog({
   onCreate,
+  responsavelPadrao,
 }: {
   onCreate: (dados: Partial<Post>) => void;
+  responsavelPadrao?: string;
 }) {
+  const equipe = useTeam();
   const [aberto, setAberto] = useState(false);
   const [titulo, setTitulo] = useState("");
   const [legenda, setLegenda] = useState("");
@@ -24,6 +28,8 @@ export function NewPostDialog({
   const [roteiro, setRoteiro] = useState("");
   const [categoria, setCategoria] = useState<Categoria | null>(null);
   const [tipo, setTipo] = useState<PostType>("feed");
+  const [responsavel, setResponsavel] = useState(responsavelPadrao ?? "");
+  const [designer, setDesigner] = useState("");
   const [data, setData] = useState(
     new Date().toISOString().slice(0, 10)
   );
@@ -38,6 +44,8 @@ export function NewPostDialog({
       roteiro,
       categoria,
       tipo,
+      responsavel_nome: responsavel || null,
+      designer_nome: designer || null,
       data_publicacao: new Date(data).toISOString(),
     });
     setTitulo("");
@@ -46,6 +54,8 @@ export function NewPostDialog({
     setRoteiro("");
     setCategoria(null);
     setTipo("feed");
+    setResponsavel(responsavelPadrao ?? "");
+    setDesigner("");
     setAberto(false);
   }
 
@@ -118,6 +128,43 @@ export function NewPostDialog({
                     onChange={(e) => setData(e.target.value)}
                     className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
                   />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                    Responsável
+                  </label>
+                  <select
+                    value={responsavel}
+                    onChange={(e) => setResponsavel(e.target.value)}
+                    className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+                  >
+                    <option value="">—</option>
+                    {equipe.map((membro) => (
+                      <option key={membro.id} value={membro.nome}>
+                        {membro.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                    Designer
+                  </label>
+                  <select
+                    value={designer}
+                    onChange={(e) => setDesigner(e.target.value)}
+                    className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+                  >
+                    <option value="">—</option>
+                    {equipe.map((membro) => (
+                      <option key={membro.id} value={membro.nome}>
+                        {membro.nome}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

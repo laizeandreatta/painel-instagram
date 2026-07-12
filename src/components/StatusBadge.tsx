@@ -3,10 +3,10 @@ import clsx from "clsx";
 
 const STYLES: Record<PostStatus, string> = {
   ideia: "bg-baby-pink-light text-bordeaux border border-baby-pink",
-  producao: "bg-baby-pink text-bordeaux border border-baby-pink",
-  aprovacao: "bg-[#f7e2b8] text-[#7a5416] border border-[#eccf8f]",
+  copy_concluida: "bg-baby-pink text-bordeaux border border-baby-pink",
+  design_concluido: "bg-[#f7e2b8] text-[#7a5416] border border-[#eccf8f]",
   agendado: "bg-[#dbe7f0] text-[#294a63] border border-[#c3d9e8]",
-  publicado: "bg-wine text-off-white border border-wine",
+  postado: "bg-wine text-off-white border border-wine",
 };
 
 export function StatusBadge({ status }: { status: PostStatus }) {
