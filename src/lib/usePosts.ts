@@ -191,6 +191,21 @@ export function usePosts() {
     []
   );
 
+  // Atualização genérica de campos (legenda, hashtags, responsável,
+  // designer etc.) — usada pelos campos editáveis da página do post.
+  const atualizarCampos = useCallback(
+    async (postId: string, patch: Partial<Post>) => {
+      setPosts((prev) =>
+        prev.map((p) => (p.id === postId ? { ...p, ...patch } : p))
+      );
+      if (isSupabaseConfigured()) {
+        const supabase = createClient();
+        await supabase.from("posts").update(patch).eq("id", postId);
+      }
+    },
+    []
+  );
+
   return {
     posts,
     loading,
@@ -202,6 +217,7 @@ export function usePosts() {
     atualizarIgMediaId,
     atualizarRoteiro,
     atualizarCategoria,
+    atualizarCampos,
     recarregar: carregar,
   };
 }

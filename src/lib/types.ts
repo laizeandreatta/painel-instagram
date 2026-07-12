@@ -1,9 +1,9 @@
 export type PostStatus =
   | "ideia"
-  | "producao"
-  | "aprovacao"
+  | "copy_concluida"
+  | "design_concluido"
   | "agendado"
-  | "publicado";
+  | "postado";
 
 export type PostType = "feed" | "stories" | "reels" | "carrossel";
 
@@ -82,18 +82,18 @@ export type SeguidoresSnapshot = {
 
 export const STATUS_LABELS: Record<PostStatus, string> = {
   ideia: "Ideia",
-  producao: "Em produção",
-  aprovacao: "Em aprovação",
+  copy_concluida: "Copy concluída",
+  design_concluido: "Design concluído",
   agendado: "Agendado",
-  publicado: "Publicado",
+  postado: "Postado",
 };
 
 export const STATUS_ORDER: PostStatus[] = [
   "ideia",
-  "producao",
-  "aprovacao",
+  "copy_concluida",
+  "design_concluido",
   "agendado",
-  "publicado",
+  "postado",
 ];
 
 export const TIPO_LABELS: Record<PostType, string> = {
