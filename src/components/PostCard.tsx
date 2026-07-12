@@ -2,10 +2,11 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ImageIcon, MessageCircle } from "lucide-react";
-import { Post, TIPO_LABELS } from "@/lib/types";
+import { CATEGORIA_CORES, CATEGORIA_LABELS, Post, TIPO_LABELS } from "@/lib/types";
 import { StatusBadge } from "./StatusBadge";
 
 export function PostCard({ post }: { post: Post }) {
+  const cor = post.categoria ? CATEGORIA_CORES[post.categoria] : null;
   return (
     <Link
       href={`/post/${post.id}`}
@@ -17,9 +18,17 @@ export function PostCard({ post }: { post: Post }) {
         </span>
         <StatusBadge status={post.status} />
       </div>
-      <h3 className="mb-1 font-editorial text-base font-semibold leading-snug text-ink group-hover:text-wine">
+      <h3 className="mb-1 text-base font-semibold leading-snug text-ink group-hover:text-wine">
         {post.titulo}
       </h3>
+      {post.categoria && cor && (
+        <span
+          style={{ background: cor.bg, color: cor.text }}
+          className="mb-2 inline-block rounded-full px-2 py-0.5 text-[10.5px] font-medium"
+        >
+          {CATEGORIA_LABELS[post.categoria]}
+        </span>
+      )}
       <p className="mb-3 line-clamp-2 text-sm text-ink/60">{post.legenda}</p>
       <div className="flex items-center justify-between text-xs text-ink/45">
         <span>

@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
-import { Post, PostType, TIPO_LABELS } from "@/lib/types";
+import {
+  CATEGORIA_CORES,
+  CATEGORIA_LABELS,
+  CATEGORIA_ORDER,
+  Categoria,
+  Post,
+  PostType,
+  TIPO_LABELS,
+} from "@/lib/types";
 
 export function NewPostDialog({
   onCreate,
@@ -13,6 +21,8 @@ export function NewPostDialog({
   const [titulo, setTitulo] = useState("");
   const [legenda, setLegenda] = useState("");
   const [hashtags, setHashtags] = useState("");
+  const [roteiro, setRoteiro] = useState("");
+  const [categoria, setCategoria] = useState<Categoria | null>(null);
   const [tipo, setTipo] = useState<PostType>("feed");
   const [data, setData] = useState(
     new Date().toISOString().slice(0, 10)
@@ -25,15 +35,33 @@ export function NewPostDialog({
       titulo,
       legenda,
       hashtags,
+      roteiro,
+      categoria,
       tipo,
       data_publicacao: new Date(data).toISOString(),
     });
     setTitulo("");
     setLegenda("");
     setHashtags("");
+    setRoteiro("");
+    setCategoria(null);
     setTipo("feed");
     setAberto(false);
   }
+
+  const rotuloRoteiro =
+    tipo === "reels"
+      ? "Roteiro do Reels"
+      : tipo === "carrossel"
+      ? "Conteúdo dos slides do carrossel"
+      : "Roteiro / conteúdo";
+
+  const placeholderRoteiro =
+    tipo === "reels"
+      ? "Gancho, desenvolvimento, CTA... escreva a fala ou o roteiro completo do vídeo."
+      : tipo === "carrossel"
+      ? "Slide 1: ...\nSlide 2: ...\nSlide 3: ...\n\nCole aqui o texto de cada slide do carrossel."
+      : "Anotações de produção, roteiro ou texto de apoio para este conteúdo.";
 
   return (
     <>
@@ -45,9 +73,9 @@ export function NewPostDialog({
       </button>
 
       {aberto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4 py-8">
+          <div className="flex max-h-full w-full max-w-2xl flex-col rounded-2xl bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-line px-6 py-4">
               <h3 className="font-editorial text-lg font-semibold text-ink">
                 Novo conteúdo
               </h3>
@@ -59,45 +87,10 @@ export function NewPostDialog({
               </button>
             </div>
 
-            <form onSubmit={salvar} className="flex flex-col gap-3">
-              <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
-                  Título
-                </label>
-                <input
-                  value={titulo}
-                  onChange={(e) => setTitulo(e.target.value)}
-                  required
-                  className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
-                  placeholder="Ex: Lançamento cápsula verão"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
-                  Legenda
-                </label>
-                <textarea
-                  value={legenda}
-                  onChange={(e) => setLegenda(e.target.value)}
-                  rows={3}
-                  className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
-                  placeholder="Escreva a legenda do post..."
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
-                  Hashtags
-                </label>
-                <input
-                  value={hashtags}
-                  onChange={(e) => setHashtags(e.target.value)}
-                  className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
-                  placeholder="#moda #lancamento"
-                />
-              </div>
-
+            <form
+              onSubmit={salvar}
+              className="flex flex-col gap-4 overflow-y-auto px-6 py-5"
+            >
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
@@ -128,9 +121,93 @@ export function NewPostDialog({
                 </div>
               </div>
 
+              <div>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                  Título
+                </label>
+                <input
+                  value={titulo}
+                  onChange={(e) => setTitulo(e.target.value)}
+                  required
+                  className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+                  placeholder="Ex: Lançamento cápsula verão"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                  Assunto
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {CATEGORIA_ORDER.map((valor) => {
+                    const cor = CATEGORIA_CORES[valor];
+                    const selecionado = categoria === valor;
+                    return (
+                      <button
+                        key={valor}
+                        type="button"
+                        onClick={() =>
+                          setCategoria(selecionado ? null : valor)
+                        }
+                        style={
+                          selecionado
+                            ? { background: cor.bg, color: cor.text }
+                            : undefined
+                        }
+                        className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                          selecionado
+                            ? "border-transparent"
+                            : "border-line bg-white text-ink/60 hover:border-wine hover:text-wine"
+                        }`}
+                      >
+                        {CATEGORIA_LABELS[valor]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                  Legenda
+                </label>
+                <textarea
+                  value={legenda}
+                  onChange={(e) => setLegenda(e.target.value)}
+                  rows={4}
+                  className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+                  placeholder="Escreva a legenda do post..."
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                  {rotuloRoteiro}
+                </label>
+                <textarea
+                  value={roteiro}
+                  onChange={(e) => setRoteiro(e.target.value)}
+                  rows={8}
+                  className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+                  placeholder={placeholderRoteiro}
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                  Hashtags
+                </label>
+                <input
+                  value={hashtags}
+                  onChange={(e) => setHashtags(e.target.value)}
+                  className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+                  placeholder="#moda #lancamento"
+                />
+              </div>
+
               <button
                 type="submit"
-                className="mt-2 rounded-lg bg-wine py-2.5 text-sm font-medium text-off-white hover:opacity-90"
+                className="mt-1 rounded-lg bg-wine py-2.5 text-sm font-medium text-off-white hover:opacity-90"
               >
                 Criar conteúdo
               </button>
