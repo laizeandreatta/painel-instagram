@@ -82,18 +82,6 @@ export default function PostDetalhePage() {
       </div>
 
       <div className="mb-8 rounded-xl border border-line bg-white p-5">
-        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
-          Legenda
-        </p>
-        <textarea
-          key={`legenda-${post.id}`}
-          defaultValue={post.legenda}
-          onBlur={(e) => atualizarCampos(post.id, { legenda: e.target.value })}
-          rows={3}
-          placeholder="Escreva a legenda do post..."
-          className="mb-5 w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
-        />
-
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
@@ -187,6 +175,23 @@ export default function PostDetalhePage() {
               ? "Slide 1: ...\nSlide 2: ...\nSlide 3: ..."
               : "Escreva aqui o roteiro completo ou o conteúdo de apoio."
           }
+          className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+        />
+      </div>
+
+      <div className="mb-8 rounded-xl border border-line bg-white p-5">
+        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
+          Legenda
+        </p>
+        <p className="mb-2 text-xs text-ink/45">
+          Fica salva automaticamente ao clicar fora do campo.
+        </p>
+        <textarea
+          key={`legenda-${post.id}`}
+          defaultValue={post.legenda}
+          onBlur={(e) => atualizarCampos(post.id, { legenda: e.target.value })}
+          rows={3}
+          placeholder="Escreva a legenda do post..."
           className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
         />
       </div>
