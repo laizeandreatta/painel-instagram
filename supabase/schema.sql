@@ -35,7 +35,7 @@ create table if not exists posts (
     'nostalgia_comunidade'
   )),
   tipo text not null default 'feed' check (tipo in ('feed', 'stories', 'reels', 'carrossel')),
-  status text not null default 'ideia' check (status in ('ideia', 'producao', 'aprovacao', 'agendado', 'publicado')),
+  status text not null default 'ideia' check (status in ('ideia', 'copy_concluida', 'design_concluido', 'agendado', 'postado')),
   data_publicacao timestamptz not null,
   responsavel_id uuid references perfis (id),
   responsavel_nome text,
@@ -178,3 +178,20 @@ begin
     ));
   end if;
 end $$;
+
+-- =========================================================================
+-- Migração: novas colunas do quadro Kanban. Antes tínhamos "Ideia",
+-- "Em produção", "Em aprovação", "Agendado", "Publicado" — agora ficou
+-- "Ideia", "Copy concluída", "Design concluído", "Agendado", "Postado".
+-- Primeiro remapeia os posts que já existem para os novos valores,
+-- depois troca a regra (constraint) que valida a coluna.
+-- =========================================================================
+update posts set status = 'copy_concluida' where status = 'producao';
+update posts set status = 'design_concluido' where status = 'aprovacao';
+update posts set status = 'postado' where status = 'publicado';
+
+alter table posts drop constraint if exists posts_status_check;
+alter table posts add constraint posts_status_check check (status in (
+  'ideia', 'copy_concluida', 'design_concluido', 'agendado', 'postado'
+));
+alter table posts alter column status set default 'ideia';
