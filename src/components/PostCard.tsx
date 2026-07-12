@@ -29,8 +29,7 @@ export function PostCard({ post }: { post: Post }) {
           {CATEGORIA_LABELS[post.categoria]}
         </span>
       )}
-      <p className="mb-3 line-clamp-2 text-sm text-ink/60">{post.legenda}</p>
-      <div className="flex items-center justify-between text-xs text-ink/45">
+      <div className="mt-3 flex items-center justify-between text-xs text-ink/45">
         <span>
           {format(new Date(post.data_publicacao), "dd 'de' MMM", {
             locale: ptBR,
