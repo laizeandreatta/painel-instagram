@@ -19,6 +19,9 @@ export const MOCK_POSTS: Post[] = [
     titulo: "Bastidores da coleção nova",
     legenda: "Um giro rápido pelos bastidores da nova coleção ✨",
     hashtags: "#bastidores #novacolecao #moda",
+    roteiro:
+      "Gancho: \"Você não faz ideia do que acontece antes de uma peça chegar até você\"...\nDesenvolvimento: mostrar bastidores, equipe, processo.\nCTA: \"Comenta qual peça você quer ver primeiro\".",
+    categoria: "marca_pessoal_branding",
     tipo: "reels",
     status: "ideia",
     data_publicacao: diasA(2),
@@ -33,6 +36,9 @@ export const MOCK_POSTS: Post[] = [
     titulo: "Carrossel: 5 dicas de styling",
     legenda: "Separamos 5 dicas para combinar as peças da semana.",
     hashtags: "#styling #dicas #outfit",
+    roteiro:
+      "Slide 1: 5 dicas de styling que você precisa saber\nSlide 2: Dica 1 — invista em peças-base\nSlide 3: Dica 2 — combine texturas\nSlide 4: Dica 3 — acessórios fazem a diferença\nSlide 5: Chamada para salvar o post",
+    categoria: "autoridade_presenca_feminina",
     tipo: "carrossel",
     status: "producao",
     data_publicacao: diasA(3),

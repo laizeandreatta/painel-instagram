@@ -68,6 +68,8 @@ export function usePosts() {
       titulo: novo.titulo ?? "Novo post",
       legenda: novo.legenda ?? "",
       hashtags: novo.hashtags ?? "",
+      roteiro: novo.roteiro ?? "",
+      categoria: novo.categoria ?? null,
       tipo: novo.tipo ?? "feed",
       status: novo.status ?? "ideia",
       data_publicacao: novo.data_publicacao ?? new Date().toISOString(),
@@ -86,6 +88,8 @@ export function usePosts() {
         titulo: post.titulo,
         legenda: post.legenda,
         hashtags: post.hashtags,
+        roteiro: post.roteiro,
+        categoria: post.categoria,
         tipo: post.tipo,
         status: post.status,
         data_publicacao: post.data_publicacao,
@@ -161,6 +165,32 @@ export function usePosts() {
     []
   );
 
+  const atualizarRoteiro = useCallback(
+    async (postId: string, roteiro: string) => {
+      setPosts((prev) =>
+        prev.map((p) => (p.id === postId ? { ...p, roteiro } : p))
+      );
+      if (isSupabaseConfigured()) {
+        const supabase = createClient();
+        await supabase.from("posts").update({ roteiro }).eq("id", postId);
+      }
+    },
+    []
+  );
+
+  const atualizarCategoria = useCallback(
+    async (postId: string, categoria: Post["categoria"]) => {
+      setPosts((prev) =>
+        prev.map((p) => (p.id === postId ? { ...p, categoria } : p))
+      );
+      if (isSupabaseConfigured()) {
+        const supabase = createClient();
+        await supabase.from("posts").update({ categoria }).eq("id", postId);
+      }
+    },
+    []
+  );
+
   return {
     posts,
     loading,
@@ -170,6 +200,8 @@ export function usePosts() {
     adicionarComentario,
     adicionarArte,
     atualizarIgMediaId,
+    atualizarRoteiro,
+    atualizarCategoria,
     recarregar: carregar,
   };
 }
