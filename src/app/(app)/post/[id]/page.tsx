@@ -82,21 +82,7 @@ export default function PostDetalhePage() {
       </div>
 
       <div className="mb-8 rounded-xl border border-line bg-white p-5">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
-              Hashtags
-            </label>
-            <input
-              key={`hashtags-${post.id}`}
-              defaultValue={post.hashtags}
-              onBlur={(e) =>
-                atualizarCampos(post.id, { hashtags: e.target.value })
-              }
-              placeholder="#moda #lancamento"
-              className="w-full rounded-lg border border-line px-3 py-2 text-sm text-wine outline-none focus:border-wine"
-            />
-          </div>
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
               Responsável
@@ -192,7 +178,18 @@ export default function PostDetalhePage() {
           onBlur={(e) => atualizarCampos(post.id, { legenda: e.target.value })}
           rows={3}
           placeholder="Escreva a legenda do post..."
-          className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+          className="mb-4 w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+        />
+
+        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
+          Hashtags
+        </label>
+        <input
+          key={`hashtags-${post.id}`}
+          defaultValue={post.hashtags}
+          onBlur={(e) => atualizarCampos(post.id, { hashtags: e.target.value })}
+          placeholder="#moda #lancamento"
+          className="w-full rounded-lg border border-line px-3 py-2 text-sm text-wine outline-none focus:border-wine"
         />
       </div>
 
