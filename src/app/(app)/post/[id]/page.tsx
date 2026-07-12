@@ -9,7 +9,15 @@ import { useAuth } from "@/lib/useAuth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { UploadArte } from "@/components/UploadArte";
 import { CommentThread } from "@/components/CommentThread";
-import { PostStatus, STATUS_LABELS, STATUS_ORDER, TIPO_LABELS } from "@/lib/types";
+import {
+  CATEGORIA_CORES,
+  CATEGORIA_LABELS,
+  CATEGORIA_ORDER,
+  PostStatus,
+  STATUS_LABELS,
+  STATUS_ORDER,
+  TIPO_LABELS,
+} from "@/lib/types";
 
 export default function PostDetalhePage() {
   const params = useParams<{ id: string }>();
@@ -20,6 +28,8 @@ export default function PostDetalhePage() {
     adicionarComentario,
     adicionarArte,
     atualizarIgMediaId,
+    atualizarRoteiro,
+    atualizarCategoria,
   } = usePosts();
   const { profile } = useAuth();
 
@@ -50,9 +60,20 @@ export default function PostDetalhePage() {
               locale: ptBR,
             })}
           </span>
-          <h1 className="font-editorial text-2xl font-semibold text-ink md:text-3xl">
+          <h1 className="text-2xl font-semibold text-ink md:text-3xl">
             {post.titulo}
           </h1>
+          {post.categoria && (
+            <span
+              style={{
+                background: CATEGORIA_CORES[post.categoria].bg,
+                color: CATEGORIA_CORES[post.categoria].text,
+              }}
+              className="mt-2 inline-block rounded-full px-2.5 py-1 text-xs font-medium"
+            >
+              {CATEGORIA_LABELS[post.categoria]}
+            </span>
+          )}
         </div>
         <StatusBadge status={post.status} />
       </div>
@@ -88,6 +109,31 @@ export default function PostDetalhePage() {
         </div>
       </div>
 
+      <div className="mb-8 rounded-xl border border-line bg-white p-5">
+        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
+          {post.tipo === "reels"
+            ? "Roteiro do Reels"
+            : post.tipo === "carrossel"
+            ? "Conteúdo dos slides do carrossel"
+            : "Roteiro / conteúdo"}
+        </p>
+        <p className="mb-2 text-xs text-ink/45">
+          Fica salvo automaticamente ao clicar fora do campo.
+        </p>
+        <textarea
+          key={post.id}
+          defaultValue={post.roteiro ?? ""}
+          onBlur={(e) => atualizarRoteiro(post.id, e.target.value)}
+          rows={10}
+          placeholder={
+            post.tipo === "carrossel"
+              ? "Slide 1: ...\nSlide 2: ...\nSlide 3: ..."
+              : "Escreva aqui o roteiro completo ou o conteúdo de apoio."
+          }
+          className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+        />
+      </div>
+
       <div className="mb-8">
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink/50">
           Alterar status
@@ -106,6 +152,36 @@ export default function PostDetalhePage() {
               {STATUS_LABELS[status as PostStatus]}
             </button>
           ))}
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink/50">
+          Alterar assunto
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {CATEGORIA_ORDER.map((valor) => {
+            const cor = CATEGORIA_CORES[valor];
+            const selecionado = post.categoria === valor;
+            return (
+              <button
+                key={valor}
+                onClick={() =>
+                  atualizarCategoria(post.id, selecionado ? null : valor)
+                }
+                style={
+                  selecionado ? { background: cor.bg, color: cor.text } : undefined
+                }
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  selecionado
+                    ? "border-transparent"
+                    : "border-line bg-white text-ink/60 hover:border-wine hover:text-wine"
+                }`}
+              >
+                {CATEGORIA_LABELS[valor]}
+              </button>
+            );
+          })}
         </div>
       </div>
 
