@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { UploadCloud } from "lucide-react";
+import { Download, UploadCloud } from "lucide-react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase";
 import { ArteUpload } from "@/lib/types";
 
@@ -46,26 +46,39 @@ export function UploadArte({
 
   return (
     <div>
-      <h3 className="mb-3 font-editorial text-lg font-semibold text-ink">
+      <h3 className="mb-1 font-editorial text-lg font-semibold text-ink">
         Artes ({artes.length})
       </h3>
+      {artes.length > 0 && (
+        <p className="mb-3 text-xs text-ink/45">
+          O arquivo original enviado fica sempre disponível. Passe o mouse
+          sobre a arte e clique em &quot;Baixar&quot; para salvar em alta
+          resolução.
+        </p>
+      )}
 
       {artes.length > 0 && (
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {artes.map((arte) => (
-            <a
+            <div
               key={arte.id}
-              href={arte.url}
-              target="_blank"
-              rel="noreferrer"
-              className="group relative block aspect-square overflow-hidden rounded-lg border border-line bg-off-white"
+              className="group relative aspect-square overflow-hidden rounded-lg border border-line bg-off-white"
             >
-              <img
-                src={arte.url}
-                alt={arte.nome_arquivo}
-                className="h-full w-full object-cover transition-transform group-hover:scale-105"
-              />
-            </a>
+              <a href={arte.url} target="_blank" rel="noreferrer" className="block h-full w-full">
+                <img
+                  src={arte.url}
+                  alt={arte.nome_arquivo}
+                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                />
+              </a>
+              <a
+                href={`${arte.url}?download=${encodeURIComponent(arte.nome_arquivo)}`}
+                title="Baixar em alta resolução"
+                className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-ink/70 px-2 py-1.5 text-[11px] font-medium text-off-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100"
+              >
+                <Download size={13} /> Baixar
+              </a>
+            </div>
           ))}
         </div>
       )}
