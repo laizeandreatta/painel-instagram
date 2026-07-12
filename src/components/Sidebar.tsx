@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { KanbanSquare, LineChart, LogOut } from "lucide-react";
+import { KanbanSquare, LayoutGrid, LineChart, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/useAuth";
 import { isSupabaseConfigured, createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
 const LINKS = [
   { href: "/dashboard", label: "Calendário & Kanban", icon: KanbanSquare },
+  { href: "/feed", label: "Feed", icon: LayoutGrid },
   { href: "/analytics", label: "Desempenho", icon: LineChart },
 ];
 
