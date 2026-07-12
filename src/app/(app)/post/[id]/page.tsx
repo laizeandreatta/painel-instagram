@@ -6,6 +6,7 @@ import { ptBR } from "date-fns/locale";
 import { ArrowLeft } from "lucide-react";
 import { usePosts } from "@/lib/usePosts";
 import { useAuth } from "@/lib/useAuth";
+import { useTeam } from "@/lib/useTeam";
 import { StatusBadge } from "@/components/StatusBadge";
 import { UploadArte } from "@/components/UploadArte";
 import { CommentThread } from "@/components/CommentThread";
@@ -30,8 +31,10 @@ export default function PostDetalhePage() {
     atualizarIgMediaId,
     atualizarRoteiro,
     atualizarCategoria,
+    atualizarCampos,
   } = usePosts();
   const { profile } = useAuth();
+  const equipe = useTeam();
 
   const post = posts.find((p) => p.id === params.id);
 
@@ -78,34 +81,88 @@ export default function PostDetalhePage() {
         <StatusBadge status={post.status} />
       </div>
 
-      <div className="mb-8 grid gap-6 rounded-xl border border-line bg-white p-5 sm:grid-cols-2">
-        <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
-            Legenda
-          </p>
-          <p className="text-sm text-ink/80 whitespace-pre-wrap">
-            {post.legenda || "—"}
-          </p>
-        </div>
-        <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
-            Hashtags
-          </p>
-          <p className="text-sm text-wine">{post.hashtags || "—"}</p>
-        </div>
-        <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
-            Responsável
-          </p>
-          <p className="text-sm text-ink/80">
-            {post.responsavel_nome ?? "—"}
-          </p>
-        </div>
-        <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
-            Designer
-          </p>
-          <p className="text-sm text-ink/80">{post.designer_nome ?? "—"}</p>
+      <div className="mb-8 rounded-xl border border-line bg-white p-5">
+        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
+          Legenda
+        </p>
+        <textarea
+          key={`legenda-${post.id}`}
+          defaultValue={post.legenda}
+          onBlur={(e) => atualizarCampos(post.id, { legenda: e.target.value })}
+          rows={3}
+          placeholder="Escreva a legenda do post..."
+          className="mb-5 w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+        />
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
+              Hashtags
+            </label>
+            <input
+              key={`hashtags-${post.id}`}
+              defaultValue={post.hashtags}
+              onBlur={(e) =>
+                atualizarCampos(post.id, { hashtags: e.target.value })
+              }
+              placeholder="#moda #lancamento"
+              className="w-full rounded-lg border border-line px-3 py-2 text-sm text-wine outline-none focus:border-wine"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
+              Responsável
+            </label>
+            <select
+              value={post.responsavel_nome ?? ""}
+              onChange={(e) =>
+                atualizarCampos(post.id, {
+                  responsavel_nome: e.target.value || null,
+                })
+              }
+              className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+            >
+              <option value="">—</option>
+              {equipe.map((membro) => (
+                <option key={membro.id} value={membro.nome}>
+                  {membro.nome}
+                </option>
+              ))}
+              {post.responsavel_nome &&
+                !equipe.some((m) => m.nome === post.responsavel_nome) && (
+                  <option value={post.responsavel_nome}>
+                    {post.responsavel_nome}
+                  </option>
+                )}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
+              Designer
+            </label>
+            <select
+              value={post.designer_nome ?? ""}
+              onChange={(e) =>
+                atualizarCampos(post.id, {
+                  designer_nome: e.target.value || null,
+                })
+              }
+              className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+            >
+              <option value="">—</option>
+              {equipe.map((membro) => (
+                <option key={membro.id} value={membro.nome}>
+                  {membro.nome}
+                </option>
+              ))}
+              {post.designer_nome &&
+                !equipe.some((m) => m.nome === post.designer_nome) && (
+                  <option value={post.designer_nome}>
+                    {post.designer_nome}
+                  </option>
+                )}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -185,7 +242,7 @@ export default function PostDetalhePage() {
         </div>
       </div>
 
-      {post.status === "publicado" && (
+      {post.status === "postado" && (
         <div className="mb-8 rounded-xl border border-line bg-white p-5">
           <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
             ID do post publicado no Instagram
