@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { usePosts } from "@/lib/usePosts";
 import { useAuth } from "@/lib/useAuth";
 import { useTeam } from "@/lib/useTeam";
@@ -33,6 +33,7 @@ export default function PostDetalhePage() {
     atualizarRoteiro,
     atualizarCategoria,
     atualizarCampos,
+    excluirPost,
   } = usePosts();
   const { profile } = useAuth();
   const equipe = useTeam();
@@ -45,6 +46,16 @@ export default function PostDetalhePage() {
         <p className="text-sm text-ink/50">Post não encontrado.</p>
       </div>
     );
+  }
+
+  function handleExcluir() {
+    if (!post) return;
+    const confirmado = window.confirm(
+      `Excluir "${post.titulo}"? Isso remove o conteúdo, as artes e os comentários e não pode ser desfeito.`
+    );
+    if (!confirmado) return;
+    excluirPost(post.id);
+    router.push("/dashboard");
   }
 
   return (
@@ -314,7 +325,7 @@ export default function PostDetalhePage() {
         />
       </div>
 
-      <div className="rounded-xl border border-line bg-white p-5">
+      <div className="mb-8 rounded-xl border border-line bg-white p-5">
         <CommentThread
           comentarios={post.comentarios}
           autorNome={profile?.nome ?? "Você"}
@@ -328,6 +339,22 @@ export default function PostDetalhePage() {
             )
           }
         />
+      </div>
+
+      <div className="rounded-xl border border-bordeaux/30 bg-bordeaux/5 p-5">
+        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-bordeaux">
+          Excluir conteúdo
+        </p>
+        <p className="mb-3 text-xs text-ink/45">
+          Remove este conteúdo, as artes enviadas e os comentários por
+          completo. Não pode ser desfeito.
+        </p>
+        <button
+          onClick={handleExcluir}
+          className="flex items-center gap-1.5 rounded-lg border border-bordeaux px-3 py-1.5 text-xs font-medium text-bordeaux transition-colors hover:bg-bordeaux hover:text-off-white"
+        >
+          <Trash2 size={14} /> Excluir conteúdo
+        </button>
       </div>
     </div>
   );
