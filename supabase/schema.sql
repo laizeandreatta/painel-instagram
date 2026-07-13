@@ -34,7 +34,7 @@ create table if not exists posts (
     'financas_femininas',
     'nostalgia_comunidade'
   )),
-  tipo text not null default 'feed' check (tipo in ('feed', 'stories', 'reels', 'carrossel')),
+  tipo text not null default 'estatico' check (tipo in ('estatico', 'reel', 'carrossel')),
   status text not null default 'ideia' check (status in ('ideia', 'copy_concluida', 'design_concluido', 'agendado', 'postado')),
   data_publicacao timestamptz not null,
   responsavel_id uuid references perfis (id),
@@ -197,3 +197,20 @@ alter table posts add constraint posts_status_check check (status in (
   'ideia', 'copy_concluida', 'design_concluido', 'agendado', 'postado'
 ));
 alter table posts alter column status set default 'ideia';
+
+-- =========================================================================
+-- Migração: novo formato de tipos de conteúdo. Antes tínhamos "Feed",
+-- "Stories", "Reels" e "Carrossel" — agora ficou só "Estático", "Reel" e
+-- "Carrossel" (Stories foi removido). Remapeia os posts que já existem:
+-- "feed" e "stories" viram "estatico", "reels" vira "reel".
+-- =========================================================================
+alter table posts drop constraint if exists posts_tipo_check;
+
+update posts set tipo = 'estatico' where tipo = 'feed';
+update posts set tipo = 'estatico' where tipo = 'stories';
+update posts set tipo = 'reel' where tipo = 'reels';
+
+alter table posts add constraint posts_tipo_check check (tipo in (
+  'estatico', 'reel', 'carrossel'
+));
+alter table posts alter column tipo set default 'estatico';
