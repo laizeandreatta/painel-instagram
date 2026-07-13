@@ -12,6 +12,7 @@ import {
   TIPO_LABELS,
 } from "@/lib/types";
 import { useTeam } from "@/lib/useTeam";
+import { handlePasteControlled } from "@/lib/textUtils";
 
 export function NewPostDialog({
   onCreate,
@@ -27,11 +28,14 @@ export function NewPostDialog({
   const [hashtags, setHashtags] = useState("");
   const [roteiro, setRoteiro] = useState("");
   const [categoria, setCategoria] = useState<Categoria | null>(null);
-  const [tipo, setTipo] = useState<PostType>("feed");
+  const [tipo, setTipo] = useState<PostType>("estatico");
   const [responsavel, setResponsavel] = useState(responsavelPadrao ?? "");
   const [designer, setDesigner] = useState("");
   const [data, setData] = useState(
     new Date().toISOString().slice(0, 10)
+  );
+  const [hora, setHora] = useState(
+    new Date().toTimeString().slice(0, 5)
   );
 
   function salvar(e: React.FormEvent) {
@@ -46,28 +50,28 @@ export function NewPostDialog({
       tipo,
       responsavel_nome: responsavel || null,
       designer_nome: designer || null,
-      data_publicacao: new Date(data).toISOString(),
+      data_publicacao: new Date(`${data}T${hora}`).toISOString(),
     });
     setTitulo("");
     setLegenda("");
     setHashtags("");
     setRoteiro("");
     setCategoria(null);
-    setTipo("feed");
+    setTipo("estatico");
     setResponsavel(responsavelPadrao ?? "");
     setDesigner("");
     setAberto(false);
   }
 
   const rotuloRoteiro =
-    tipo === "reels"
-      ? "Roteiro do Reels"
+    tipo === "reel"
+      ? "Roteiro do Reel"
       : tipo === "carrossel"
       ? "Conteúdo dos slides do carrossel"
       : "Roteiro / conteúdo";
 
   const placeholderRoteiro =
-    tipo === "reels"
+    tipo === "reel"
       ? "Gancho, desenvolvimento, CTA... escreva a fala ou o roteiro completo do vídeo."
       : tipo === "carrossel"
       ? "Slide 1: ...\nSlide 2: ...\nSlide 3: ...\n\nCole aqui o texto de cada slide do carrossel."
@@ -101,7 +105,7 @@ export function NewPostDialog({
               onSubmit={salvar}
               className="flex flex-col gap-4 overflow-y-auto px-6 py-5"
             >
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
                     Formato
@@ -126,6 +130,17 @@ export function NewPostDialog({
                     type="date"
                     value={data}
                     onChange={(e) => setData(e.target.value)}
+                    className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                    Hora
+                  </label>
+                  <input
+                    type="time"
+                    value={hora}
+                    onChange={(e) => setHora(e.target.value)}
                     className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
                   />
                 </div>
@@ -221,6 +236,7 @@ export function NewPostDialog({
                 <textarea
                   value={legenda}
                   onChange={(e) => setLegenda(e.target.value)}
+                  onPaste={(e) => handlePasteControlled(e, legenda, setLegenda)}
                   rows={4}
                   className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
                   placeholder="Escreva a legenda do post..."
@@ -234,6 +250,7 @@ export function NewPostDialog({
                 <textarea
                   value={roteiro}
                   onChange={(e) => setRoteiro(e.target.value)}
+                  onPaste={(e) => handlePasteControlled(e, roteiro, setRoteiro)}
                   rows={8}
                   className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
                   placeholder={placeholderRoteiro}
