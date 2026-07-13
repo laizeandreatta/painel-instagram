@@ -10,6 +10,7 @@ import { useTeam } from "@/lib/useTeam";
 import { StatusBadge } from "@/components/StatusBadge";
 import { UploadArte } from "@/components/UploadArte";
 import { CommentThread } from "@/components/CommentThread";
+import { handlePasteUncontrolled } from "@/lib/textUtils";
 import {
   CATEGORIA_CORES,
   CATEGORIA_LABELS,
@@ -59,7 +60,7 @@ export default function PostDetalhePage() {
         <div>
           <span className="mb-2 inline-block text-[11px] font-semibold uppercase tracking-wider text-wine">
             {TIPO_LABELS[post.tipo]} ·{" "}
-            {format(new Date(post.data_publicacao), "dd 'de' MMMM, yyyy", {
+            {format(new Date(post.data_publicacao), "dd 'de' MMMM, yyyy 'às' HH:mm", {
               locale: ptBR,
             })}
           </span>
@@ -137,13 +138,51 @@ export default function PostDetalhePage() {
                 )}
             </select>
           </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
+              Data de publicação
+            </label>
+            <input
+              key={`data-${post.id}`}
+              type="date"
+              defaultValue={format(new Date(post.data_publicacao), "yyyy-MM-dd")}
+              onBlur={(e) => {
+                const horaAtual = format(new Date(post.data_publicacao), "HH:mm");
+                atualizarCampos(post.id, {
+                  data_publicacao: new Date(
+                    `${e.target.value}T${horaAtual}`
+                  ).toISOString(),
+                });
+              }}
+              className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
+              Horário de publicação
+            </label>
+            <input
+              key={`hora-${post.id}`}
+              type="time"
+              defaultValue={format(new Date(post.data_publicacao), "HH:mm")}
+              onBlur={(e) => {
+                const dataAtual = format(new Date(post.data_publicacao), "yyyy-MM-dd");
+                atualizarCampos(post.id, {
+                  data_publicacao: new Date(
+                    `${dataAtual}T${e.target.value}`
+                  ).toISOString(),
+                });
+              }}
+              className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+            />
+          </div>
         </div>
       </div>
 
       <div className="mb-8 rounded-xl border border-line bg-white p-5">
         <p className="mb-1 text-xs font-medium uppercase tracking-wide text-ink/50">
-          {post.tipo === "reels"
-            ? "Roteiro do Reels"
+          {post.tipo === "reel"
+            ? "Roteiro do Reel"
             : post.tipo === "carrossel"
             ? "Conteúdo dos slides do carrossel"
             : "Roteiro / conteúdo"}
@@ -155,6 +194,7 @@ export default function PostDetalhePage() {
           key={post.id}
           defaultValue={post.roteiro ?? ""}
           onBlur={(e) => atualizarRoteiro(post.id, e.target.value)}
+          onPaste={handlePasteUncontrolled}
           rows={10}
           placeholder={
             post.tipo === "carrossel"
@@ -176,6 +216,7 @@ export default function PostDetalhePage() {
           key={`legenda-${post.id}`}
           defaultValue={post.legenda}
           onBlur={(e) => atualizarCampos(post.id, { legenda: e.target.value })}
+          onPaste={handlePasteUncontrolled}
           rows={3}
           placeholder="Escreva a legenda do post..."
           className="mb-4 w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
