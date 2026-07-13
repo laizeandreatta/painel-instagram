@@ -10,7 +10,7 @@ function primeiraArte(post: Post) {
 }
 
 function IconeTipo({ post }: { post: Post }) {
-  if (post.tipo === "reels") return <Clapperboard size={14} />;
+  if (post.tipo === "reel") return <Clapperboard size={14} />;
   if (post.tipo === "carrossel") return <Layers size={14} />;
   return null;
 }
@@ -19,11 +19,7 @@ export default function FeedPage() {
   const { posts, loading } = usePosts();
 
   const feedPosts = posts
-    .filter(
-      (p) =>
-        p.tipo !== "stories" &&
-        (p.status === "agendado" || p.status === "postado")
-    )
+    .filter((p) => p.status === "agendado" || p.status === "postado")
     .sort(
       (a, b) =>
         new Date(b.data_publicacao).getTime() -
@@ -75,7 +71,7 @@ export default function FeedPage() {
                   )}
                 </Link>
 
-                {(post.tipo === "reels" || post.tipo === "carrossel") && (
+                {(post.tipo === "reel" || post.tipo === "carrossel") && (
                   <span className="pointer-events-none absolute right-1.5 top-1.5 text-off-white drop-shadow">
                     <IconeTipo post={post} />
                   </span>
