@@ -20,9 +20,8 @@ import clsx from "clsx";
 import { Post, TIPO_LABELS } from "@/lib/types";
 
 const TIPO_DOT: Record<string, string> = {
-  feed: "bg-wine",
-  stories: "bg-baby-pink",
-  reels: "bg-bordeaux",
+  estatico: "bg-wine",
+  reel: "bg-bordeaux",
   carrossel: "bg-[#c99b3f]",
 };
 
@@ -119,6 +118,9 @@ export function CalendarView({ posts }: { posts: Post[] }) {
                         TIPO_DOT[post.tipo]
                       )}
                     />
+                    <span className="shrink-0 text-ink/40">
+                      {format(new Date(post.data_publicacao), "HH:mm")}
+                    </span>
                     <span className="truncate">{post.titulo}</span>
                   </Link>
                 ))}
