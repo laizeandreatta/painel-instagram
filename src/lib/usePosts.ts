@@ -70,7 +70,7 @@ export function usePosts() {
       hashtags: novo.hashtags ?? "",
       roteiro: novo.roteiro ?? "",
       categoria: novo.categoria ?? null,
-      tipo: novo.tipo ?? "feed",
+      tipo: novo.tipo ?? "estatico",
       status: novo.status ?? "ideia",
       data_publicacao: novo.data_publicacao ?? new Date().toISOString(),
       responsavel_nome: novo.responsavel_nome ?? null,
