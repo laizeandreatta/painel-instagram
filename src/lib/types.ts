@@ -5,7 +5,7 @@ export type PostStatus =
   | "agendado"
   | "postado";
 
-export type PostType = "feed" | "stories" | "reels" | "carrossel";
+export type PostType = "estatico" | "reel" | "carrossel";
 
 export type Categoria =
   | "saude_mental_bem_estar"
@@ -97,9 +97,8 @@ export const STATUS_ORDER: PostStatus[] = [
 ];
 
 export const TIPO_LABELS: Record<PostType, string> = {
-  feed: "Feed",
-  stories: "Stories",
-  reels: "Reels",
+  estatico: "Estático",
+  reel: "Reel",
   carrossel: "Carrossel",
 };
 
