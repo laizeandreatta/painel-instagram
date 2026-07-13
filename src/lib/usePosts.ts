@@ -206,6 +206,17 @@ export function usePosts() {
     []
   );
 
+  // Exclui um conteúdo por completo (e, por cascade no banco, suas artes
+  // e comentários junto). Usado quando um conteúdo planejado deixou de
+  // fazer sentido e precisa sair do painel de vez.
+  const excluirPost = useCallback(async (postId: string) => {
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      await supabase.from("posts").delete().eq("id", postId);
+    }
+  }, []);
+
   return {
     posts,
     loading,
@@ -218,6 +229,7 @@ export function usePosts() {
     atualizarRoteiro,
     atualizarCategoria,
     atualizarCampos,
+    excluirPost,
     recarregar: carregar,
   };
 }
