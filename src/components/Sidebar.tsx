@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { KanbanSquare, LayoutGrid, LineChart, LogOut } from "lucide-react";
+import {
+  Image as ImageIcon,
+  KanbanSquare,
+  LayoutGrid,
+  LineChart,
+  LogOut,
+  Palette,
+} from "lucide-react";
 import { useAuth } from "@/lib/useAuth";
 import { isSupabaseConfigured, createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
@@ -11,6 +18,8 @@ import { useRouter } from "next/navigation";
 const LINKS = [
   { href: "/dashboard", label: "Calendário & Kanban", icon: KanbanSquare },
   { href: "/feed", label: "Feed", icon: LayoutGrid },
+  { href: "/fotos", label: "Minhas fotos", icon: ImageIcon },
+  { href: "/identidade-visual", label: "Identidade Visual", icon: Palette },
   { href: "/analytics", label: "Desempenho", icon: LineChart },
 ];
 
@@ -31,10 +40,10 @@ export function Sidebar() {
     <aside className="hidden md:flex md:w-64 shrink-0 flex-col border-r border-line bg-off-white px-5 py-7">
       <div className="mb-10 px-1">
         <p className="font-editorial text-2xl font-semibold tracking-tight text-ink">
-          Editorial
+          Dashboard
         </p>
         <p className="text-xs uppercase tracking-[0.2em] text-wine">
-          Painel de Conteúdo
+          Laize Andreatta
         </p>
       </div>
 
