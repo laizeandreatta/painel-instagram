@@ -320,3 +320,12 @@ create policy "equipe envia arquivos do moodboard" on storage.objects
   for insert with check (bucket_id = 'moodboard' and auth.role() = 'authenticated');
 create policy "equipe apaga arquivos do moodboard" on storage.objects
   for delete using (bucket_id = 'moodboard' and auth.role() = 'authenticated');
+
+-- =========================================================================
+-- Migração: permite excluir artes individuais de um post (a tabela e o
+-- bucket de storage já existiam, mas faltava a policy de delete).
+-- =========================================================================
+create policy "equipe apaga artes" on artes for delete using (auth.role() = 'authenticated');
+
+create policy "equipe apaga arquivos de artes" on storage.objects
+  for delete using (bucket_id = 'artes' and auth.role() = 'authenticated');
