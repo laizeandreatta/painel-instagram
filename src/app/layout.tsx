@@ -15,8 +15,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Editorial | Painel de Conteúdo",
-  description: "Painel de planejamento de conteúdo do Instagram",
+  title: "Dashboard Laize Andreatta",
+  description:
+    "Dashboard de planejamento de conteúdo, banco de fotos e identidade visual",
 };
 
 export default function RootLayout({
