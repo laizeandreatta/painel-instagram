@@ -81,6 +81,42 @@ export type SeguidoresSnapshot = {
   seguidores: number;
 };
 
+// Banco de fotos: imagens soltas (não ligadas a um post específico) que
+// qualquer pessoa da equipe envia para que a designer tenha acesso direto.
+export type Foto = {
+  id: string;
+  url: string;
+  nome_arquivo: string;
+  enviado_por: string;
+  criado_em: string;
+};
+
+// Identidade visual: paleta de cores, tipografia e moodboard de referência.
+export type CorPaleta = {
+  id: string;
+  nome: string;
+  hex: string;
+  ordem: number;
+  criado_em: string;
+};
+
+export type Tipografia = {
+  id: string;
+  nome: string;
+  uso?: string | null;
+  url_referencia?: string | null;
+  ordem: number;
+  criado_em: string;
+};
+
+export type MoodboardImagem = {
+  id: string;
+  url: string;
+  nome_arquivo: string;
+  enviado_por: string;
+  criado_em: string;
+};
+
 export const STATUS_LABELS: Record<PostStatus, string> = {
   ideia: "Ideia",
   copy_concluida: "Copy concluída",
