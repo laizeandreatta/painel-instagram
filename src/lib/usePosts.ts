@@ -149,6 +149,23 @@ export function usePosts() {
     }
   }, []);
 
+  // Exclui uma arte específica de um post (mantém o post e o restante das
+  // artes intactos). Usado quando um arquivo foi enviado por engano ou uma
+  // versão antiga precisa sair para não confundir quem for aprovar.
+  const excluirArte = useCallback(async (postId: string, arteId: string) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, artes: p.artes.filter((a) => a.id !== arteId) }
+          : p
+      )
+    );
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      await supabase.from("artes").delete().eq("id", arteId);
+    }
+  }, []);
+
   const atualizarIgMediaId = useCallback(
     async (postId: string, igMediaId: string) => {
       setPosts((prev) =>
@@ -225,6 +242,7 @@ export function usePosts() {
     criarPost,
     adicionarComentario,
     adicionarArte,
+    excluirArte,
     atualizarIgMediaId,
     atualizarRoteiro,
     atualizarCategoria,
