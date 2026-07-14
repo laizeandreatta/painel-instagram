@@ -19,25 +19,31 @@ export function UploadArte({
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, setEnviando] = useState(false);
 
-  async function selecionarArquivo(e: React.ChangeEvent<HTMLInputElement>) {
-    const arquivo = e.target.files?.[0];
-    if (!arquivo) return;
+  async function selecionarArquivos(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivos = e.target.files;
+    if (!arquivos || arquivos.length === 0) return;
     setEnviando(true);
 
-    if (isSupabaseConfigured()) {
-      const supabase = createClient();
-      const caminho = `${postId}/${Date.now()}-${arquivo.name}`;
-      const { error } = await supabase.storage
-        .from("artes")
-        .upload(caminho, arquivo);
-      if (!error) {
-        const { data } = supabase.storage.from("artes").getPublicUrl(caminho);
-        onEnviado(data.publicUrl, arquivo.name);
+    // Envia um de cada vez (em sequência) para não sobrecarregar a conexão
+    // quando várias imagens são selecionadas juntas.
+    for (const arquivo of Array.from(arquivos)) {
+      if (isSupabaseConfigured()) {
+        const supabase = createClient();
+        const caminho = `${postId}/${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2, 7)}-${arquivo.name}`;
+        const { error } = await supabase.storage
+          .from("artes")
+          .upload(caminho, arquivo);
+        if (!error) {
+          const { data } = supabase.storage.from("artes").getPublicUrl(caminho);
+          onEnviado(data.publicUrl, arquivo.name);
+        }
+      } else {
+        // Modo demo: usa uma URL local temporária (não persiste após recarregar).
+        const url = URL.createObjectURL(arquivo);
+        onEnviado(url, arquivo.name);
       }
-    } else {
-      // Modo demo: usa uma URL local temporária (não persiste após recarregar).
-      const url = URL.createObjectURL(arquivo);
-      onEnviado(url, arquivo.name);
     }
 
     setEnviando(false);
@@ -85,13 +91,16 @@ export function UploadArte({
 
       <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-line bg-off-white px-4 py-6 text-sm text-ink/50 hover:border-wine hover:text-wine">
         <UploadCloud size={18} />
-        {enviando ? "Enviando..." : `Enviar arte como ${enviadoPor}`}
+        {enviando
+          ? "Enviando..."
+          : `Enviar arte como ${enviadoPor} (pode selecionar várias de uma vez)`}
         <input
           ref={inputRef}
           type="file"
           accept="image/*,video/*"
+          multiple
           className="hidden"
-          onChange={selecionarArquivo}
+          onChange={selecionarArquivos}
           disabled={enviando}
         />
       </label>
