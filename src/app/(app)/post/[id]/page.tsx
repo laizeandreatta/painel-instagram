@@ -29,6 +29,7 @@ export default function PostDetalhePage() {
     atualizarStatus,
     adicionarComentario,
     adicionarArte,
+    excluirArte,
     atualizarIgMediaId,
     atualizarRoteiro,
     atualizarCategoria,
@@ -322,6 +323,7 @@ export default function PostDetalhePage() {
           onEnviado={(url, nome) =>
             adicionarArte(post.id, url, nome, profile?.nome ?? "Você")
           }
+          onExcluir={(arteId) => excluirArte(post.id, arteId)}
         />
       </div>
 
