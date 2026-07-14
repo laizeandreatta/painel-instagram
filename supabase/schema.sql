@@ -32,7 +32,8 @@ create table if not exists posts (
     'produto_promocional',
     'marca_pessoal_branding',
     'financas_femininas',
-    'nostalgia_comunidade'
+    'nostalgia_comunidade',
+    'relacionamentos_comportamento_social'
   )),
   tipo text not null default 'estatico' check (tipo in ('estatico', 'reel', 'carrossel')),
   status text not null default 'ideia' check (status in ('ideia', 'copy_concluida', 'design_concluido', 'agendado', 'postado')),
@@ -214,3 +215,23 @@ alter table posts add constraint posts_tipo_check check (tipo in (
   'estatico', 'reel', 'carrossel'
 ));
 alter table posts alter column tipo set default 'estatico';
+
+-- =========================================================================
+-- Migração: nova editoria "Relacionamentos & Comportamento Social" nos
+-- assuntos possíveis de um conteúdo. Não remapeia nada (é só uma opção
+-- nova), só amplia a regra de valores permitidos.
+-- =========================================================================
+alter table posts drop constraint if exists posts_categoria_check;
+
+alter table posts add constraint posts_categoria_check check (categoria in (
+  'saude_mental_bem_estar',
+  'mentalidade_sucesso',
+  'autoridade_presenca_feminina',
+  'autoestima_autoconhecimento',
+  'carreira_posicionamento',
+  'produto_promocional',
+  'marca_pessoal_branding',
+  'financas_femininas',
+  'nostalgia_comunidade',
+  'relacionamentos_comportamento_social'
+));
