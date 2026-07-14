@@ -235,3 +235,88 @@ alter table posts add constraint posts_categoria_check check (categoria in (
   'nostalgia_comunidade',
   'relacionamentos_comportamento_social'
 ));
+
+-- =========================================================================
+-- Novidade: banco de fotos (soltas, não ligadas a um post) para a
+-- designer ter acesso direto ao que a equipe sobe, e identidade visual
+-- (paleta de cores, tipografia, moodboard) editável pelo painel.
+-- =========================================================================
+
+-- Banco de fotos
+create table if not exists fotos (
+  id text primary key,
+  url text not null,
+  nome_arquivo text,
+  enviado_por text,
+  criado_em timestamptz not null default now()
+);
+
+alter table fotos enable row level security;
+create policy "equipe le fotos" on fotos for select using (auth.role() = 'authenticated');
+create policy "equipe envia fotos" on fotos for insert with check (auth.role() = 'authenticated');
+create policy "equipe apaga fotos" on fotos for delete using (auth.role() = 'authenticated');
+
+insert into storage.buckets (id, name, public)
+values ('fotos', 'fotos', true)
+on conflict (id) do nothing;
+
+create policy "leitura publica das fotos" on storage.objects
+  for select using (bucket_id = 'fotos');
+create policy "equipe envia arquivos de fotos" on storage.objects
+  for insert with check (bucket_id = 'fotos' and auth.role() = 'authenticated');
+create policy "equipe apaga arquivos de fotos" on storage.objects
+  for delete using (bucket_id = 'fotos' and auth.role() = 'authenticated');
+
+-- Identidade visual: paleta de cores
+create table if not exists paleta_cores (
+  id text primary key,
+  nome text not null,
+  hex text not null,
+  ordem bigint not null default 0,
+  criado_em timestamptz not null default now()
+);
+
+alter table paleta_cores enable row level security;
+create policy "equipe le paleta" on paleta_cores for select using (auth.role() = 'authenticated');
+create policy "equipe cria cores" on paleta_cores for insert with check (auth.role() = 'authenticated');
+create policy "equipe apaga cores" on paleta_cores for delete using (auth.role() = 'authenticated');
+
+-- Identidade visual: tipografia
+create table if not exists tipografias (
+  id text primary key,
+  nome text not null,
+  uso text,
+  url_referencia text,
+  ordem bigint not null default 0,
+  criado_em timestamptz not null default now()
+);
+
+alter table tipografias enable row level security;
+create policy "equipe le tipografias" on tipografias for select using (auth.role() = 'authenticated');
+create policy "equipe cria tipografias" on tipografias for insert with check (auth.role() = 'authenticated');
+create policy "equipe apaga tipografias" on tipografias for delete using (auth.role() = 'authenticated');
+
+-- Identidade visual: moodboard (imagens de referência)
+create table if not exists moodboard_imagens (
+  id text primary key,
+  url text not null,
+  nome_arquivo text,
+  enviado_por text,
+  criado_em timestamptz not null default now()
+);
+
+alter table moodboard_imagens enable row level security;
+create policy "equipe le moodboard" on moodboard_imagens for select using (auth.role() = 'authenticated');
+create policy "equipe envia moodboard" on moodboard_imagens for insert with check (auth.role() = 'authenticated');
+create policy "equipe apaga moodboard" on moodboard_imagens for delete using (auth.role() = 'authenticated');
+
+insert into storage.buckets (id, name, public)
+values ('moodboard', 'moodboard', true)
+on conflict (id) do nothing;
+
+create policy "leitura publica do moodboard" on storage.objects
+  for select using (bucket_id = 'moodboard');
+create policy "equipe envia arquivos do moodboard" on storage.objects
+  for insert with check (bucket_id = 'moodboard' and auth.role() = 'authenticated');
+create policy "equipe apaga arquivos do moodboard" on storage.objects
+  for delete using (bucket_id = 'moodboard' and auth.role() = 'authenticated');
