@@ -5,13 +5,16 @@ import clsx from "clsx";
 import { usePosts } from "@/lib/usePosts";
 import { KanbanBoard } from "@/components/KanbanBoard";
 import { CalendarView } from "@/components/CalendarView";
+import { TableView } from "@/components/TableView";
 import { NewPostDialog } from "@/components/NewPostDialog";
 import { useAuth } from "@/lib/useAuth";
 
 export default function DashboardPage() {
   const { posts, atualizarStatus, criarPost, loading } = usePosts();
   const { profile } = useAuth();
-  const [visao, setVisao] = useState<"kanban" | "calendario">("kanban");
+  const [visao, setVisao] = useState<"kanban" | "tabela" | "calendario">(
+    "kanban"
+  );
 
   return (
     <div className="px-6 py-7 md:px-10">
@@ -40,6 +43,17 @@ export default function DashboardPage() {
               Kanban
             </button>
             <button
+              onClick={() => setVisao("tabela")}
+              className={clsx(
+                "rounded-md px-3 py-1.5 text-sm font-medium",
+                visao === "tabela"
+                  ? "bg-wine text-off-white"
+                  : "text-ink/60 hover:text-ink"
+              )}
+            >
+              Tabela
+            </button>
+            <button
               onClick={() => setVisao("calendario")}
               className={clsx(
                 "rounded-md px-3 py-1.5 text-sm font-medium",
@@ -62,6 +76,8 @@ export default function DashboardPage() {
         <p className="text-sm text-ink/50">Carregando conteúdos...</p>
       ) : visao === "kanban" ? (
         <KanbanBoard posts={posts} onStatusChange={atualizarStatus} />
+      ) : visao === "tabela" ? (
+        <TableView posts={posts} />
       ) : (
         <CalendarView posts={posts} />
       )}
