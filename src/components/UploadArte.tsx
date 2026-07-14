@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Download, UploadCloud } from "lucide-react";
+import { Download, Trash2, UploadCloud } from "lucide-react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase";
 import { ArteUpload } from "@/lib/types";
 
@@ -10,11 +10,13 @@ export function UploadArte({
   artes,
   enviadoPor,
   onEnviado,
+  onExcluir,
 }: {
   postId: string;
   artes: ArteUpload[];
   enviadoPor: string;
   onEnviado: (url: string, nomeArquivo: string) => void;
+  onExcluir: (arteId: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, setEnviando] = useState(false);
@@ -50,6 +52,14 @@ export function UploadArte({
     if (inputRef.current) inputRef.current.value = "";
   }
 
+  function handleExcluir(arteId: string, nomeArquivo: string) {
+    const confirmado = window.confirm(
+      `Excluir a arte "${nomeArquivo}"? Não pode ser desfeito.`
+    );
+    if (!confirmado) return;
+    onExcluir(arteId);
+  }
+
   return (
     <div>
       <h3 className="mb-1 font-editorial text-lg font-semibold text-ink">
@@ -77,13 +87,22 @@ export function UploadArte({
                   className="h-full w-full object-cover transition-transform group-hover:scale-105"
                 />
               </a>
-              <a
-                href={`${arte.url}?download=${encodeURIComponent(arte.nome_arquivo)}`}
-                title="Baixar em alta resolução"
-                className="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-ink/70 px-2 py-1.5 text-[11px] font-medium text-off-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100"
-              >
-                <Download size={13} /> Baixar
-              </a>
+              <div className="absolute right-2 top-2 flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                <a
+                  href={`${arte.url}?download=${encodeURIComponent(arte.nome_arquivo)}`}
+                  title="Baixar em alta resolução"
+                  className="flex items-center gap-1 rounded-full bg-ink/70 px-2 py-1.5 text-[11px] font-medium text-off-white backdrop-blur-sm"
+                >
+                  <Download size={13} /> Baixar
+                </a>
+                <button
+                  onClick={() => handleExcluir(arte.id, arte.nome_arquivo)}
+                  title="Excluir arte"
+                  className="flex items-center gap-1 rounded-full bg-bordeaux/80 px-2 py-1.5 text-[11px] font-medium text-off-white backdrop-blur-sm"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
             </div>
           ))}
         </div>
