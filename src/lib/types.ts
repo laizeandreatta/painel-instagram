@@ -16,7 +16,8 @@ export type Categoria =
   | "produto_promocional"
   | "marca_pessoal_branding"
   | "financas_femininas"
-  | "nostalgia_comunidade";
+  | "nostalgia_comunidade"
+  | "relacionamentos_comportamento_social";
 
 export type Profile = {
   id: string;
@@ -112,6 +113,7 @@ export const CATEGORIA_LABELS: Record<Categoria, string> = {
   marca_pessoal_branding: "Marca Pessoal & Branding",
   financas_femininas: "Finanças Femininas",
   nostalgia_comunidade: "Nostalgia & Comunidade / Institucional",
+  relacionamentos_comportamento_social: "Relacionamentos & Comportamento Social",
 };
 
 export const CATEGORIA_ORDER: Categoria[] = [
@@ -124,6 +126,7 @@ export const CATEGORIA_ORDER: Categoria[] = [
   "marca_pessoal_branding",
   "financas_femininas",
   "nostalgia_comunidade",
+  "relacionamentos_comportamento_social",
 ];
 
 // Tons suaves e distintos para identificar cada assunto rapidamente nos
@@ -138,4 +141,5 @@ export const CATEGORIA_CORES: Record<Categoria, { bg: string; text: string }> = 
   marca_pessoal_branding: { bg: "#F1DCE0", text: "#7A3040" },
   financas_femininas: { bg: "#D9EEE9", text: "#1F6B58" },
   nostalgia_comunidade: { bg: "#F0E6D8", text: "#6B5535" },
+  relacionamentos_comportamento_social: { bg: "#F5D9D4", text: "#8C3D2E" },
 };
