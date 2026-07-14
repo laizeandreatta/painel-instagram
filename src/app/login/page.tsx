@@ -58,10 +58,10 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         <div className="mb-10 text-center">
           <p className="font-editorial text-3xl font-semibold tracking-tight text-ink">
-            Editorial
+            Dashboard
           </p>
           <p className="text-xs uppercase tracking-[0.25em] text-wine">
-            Painel de Conteúdo
+            Laize Andreatta
           </p>
         </div>
 
