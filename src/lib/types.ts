@@ -17,6 +17,7 @@ export type Categoria =
   | "marca_pessoal_branding"
   | "financas_femininas"
   | "negocios_digitais"
+  | "marketing_conteudo"
   | "nostalgia_comunidade"
   | "relacionamentos_comportamento_social";
 
@@ -153,6 +154,7 @@ export const CATEGORIA_LABELS: Record<Categoria, string> = {
   marca_pessoal_branding: "Marca Pessoal & Branding",
   financas_femininas: "Finanças Femininas",
   negocios_digitais: "Negócios Digitais",
+  marketing_conteudo: "Marketing e Conteúdo",
   nostalgia_comunidade: "Nostalgia & Comunidade / Institucional",
   relacionamentos_comportamento_social: "Relacionamentos & Comportamento Social",
 };
@@ -167,6 +169,7 @@ export const CATEGORIA_ORDER: Categoria[] = [
   "marca_pessoal_branding",
   "financas_femininas",
   "negocios_digitais",
+  "marketing_conteudo",
   "nostalgia_comunidade",
   "relacionamentos_comportamento_social",
 ];
@@ -183,6 +186,7 @@ export const CATEGORIA_CORES: Record<Categoria, { bg: string; text: string }> = 
   marca_pessoal_branding: { bg: "#F1DCE0", text: "#7A3040" },
   financas_femininas: { bg: "#D9EEE9", text: "#1F6B58" },
   negocios_digitais: { bg: "#E2E5F0", text: "#3A4470" },
+  marketing_conteudo: { bg: "#F6EFD0", text: "#8A6D12" },
   nostalgia_comunidade: { bg: "#F0E6D8", text: "#6B5535" },
   relacionamentos_comportamento_social: { bg: "#F5D9D4", text: "#8C3D2E" },
 };
