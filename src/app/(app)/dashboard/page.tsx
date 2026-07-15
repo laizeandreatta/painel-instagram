@@ -14,7 +14,7 @@ export default function DashboardPage() {
     usePosts();
   const { profile } = useAuth();
   const [visao, setVisao] = useState<"kanban" | "tabela" | "calendario">(
-    "kanban"
+    "tabela"
   );
 
   return (
@@ -33,17 +33,6 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           <div className="flex rounded-lg border border-line bg-white p-1">
             <button
-              onClick={() => setVisao("kanban")}
-              className={clsx(
-                "rounded-md px-3 py-1.5 text-sm font-medium",
-                visao === "kanban"
-                  ? "bg-wine text-off-white"
-                  : "text-ink/60 hover:text-ink"
-              )}
-            >
-              Kanban
-            </button>
-            <button
               onClick={() => setVisao("tabela")}
               className={clsx(
                 "rounded-md px-3 py-1.5 text-sm font-medium",
@@ -53,6 +42,17 @@ export default function DashboardPage() {
               )}
             >
               Tabela
+            </button>
+            <button
+              onClick={() => setVisao("kanban")}
+              className={clsx(
+                "rounded-md px-3 py-1.5 text-sm font-medium",
+                visao === "kanban"
+                  ? "bg-wine text-off-white"
+                  : "text-ink/60 hover:text-ink"
+              )}
+            >
+              Kanban
             </button>
             <button
               onClick={() => setVisao("calendario")}
