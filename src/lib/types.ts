@@ -139,6 +139,8 @@ export const TIPO_LABELS: Record<PostType, string> = {
   carrossel: "Carrossel",
 };
 
+export const TIPO_ORDER: PostType[] = ["estatico", "reel", "carrossel"];
+
 export const CATEGORIA_LABELS: Record<Categoria, string> = {
   saude_mental_bem_estar: "Saúde Mental & Bem-estar",
   mentalidade_sucesso: "Mentalidade & Sucesso / filosofia aplicada",
