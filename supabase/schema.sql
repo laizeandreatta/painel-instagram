@@ -33,6 +33,7 @@ create table if not exists posts (
     'marca_pessoal_branding',
     'financas_femininas',
     'negocios_digitais',
+    'marketing_conteudo',
     'nostalgia_comunidade',
     'relacionamentos_comportamento_social'
   )),
@@ -363,3 +364,24 @@ with numerados as (
 update posts set ordem = numerados.rn
 from numerados
 where posts.id = numerados.id and posts.ordem = 0;
+
+-- =========================================================================
+-- Migração: nova editoria "Marketing e Conteúdo" nos assuntos possíveis
+-- de um conteúdo. Não remapeia nada (é só uma opção nova), só amplia a
+-- regra de valores permitidos.
+-- =========================================================================
+alter table posts drop constraint if exists posts_categoria_check;
+alter table posts add constraint posts_categoria_check check (categoria in (
+  'saude_mental_bem_estar',
+  'mentalidade_sucesso',
+  'autoridade_presenca_feminina',
+  'autoestima_autoconhecimento',
+  'carreira_posicionamento',
+  'produto_promocional',
+  'marca_pessoal_branding',
+  'financas_femininas',
+  'negocios_digitais',
+  'marketing_conteudo',
+  'nostalgia_comunidade',
+  'relacionamentos_comportamento_social'
+));
