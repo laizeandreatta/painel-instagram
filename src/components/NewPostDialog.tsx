@@ -8,7 +8,10 @@ import {
   CATEGORIA_ORDER,
   Categoria,
   Post,
+  PostStatus,
   PostType,
+  STATUS_LABELS,
+  STATUS_ORDER,
   TIPO_LABELS,
 } from "@/lib/types";
 import { useTeam } from "@/lib/useTeam";
@@ -29,6 +32,7 @@ export function NewPostDialog({
   const [roteiro, setRoteiro] = useState("");
   const [categoria, setCategoria] = useState<Categoria | null>(null);
   const [tipo, setTipo] = useState<PostType>("estatico");
+  const [status, setStatus] = useState<PostStatus>("ideia");
   const [responsavel, setResponsavel] = useState(responsavelPadrao ?? "");
   const [designer, setDesigner] = useState("");
   const [data, setData] = useState(
@@ -48,6 +52,7 @@ export function NewPostDialog({
       roteiro,
       categoria,
       tipo,
+      status,
       responsavel_nome: responsavel || null,
       designer_nome: designer || null,
       data_publicacao: new Date(`${data}T${hora}`).toISOString(),
@@ -58,6 +63,7 @@ export function NewPostDialog({
     setRoteiro("");
     setCategoria(null);
     setTipo("estatico");
+    setStatus("ideia");
     setResponsavel(responsavelPadrao ?? "");
     setDesigner("");
     setAberto(false);
@@ -146,7 +152,7 @@ export function NewPostDialog({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
                     Responsável
@@ -177,6 +183,22 @@ export function NewPostDialog({
                     {equipe.map((membro) => (
                       <option key={membro.id} value={membro.nome}>
                         {membro.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                    Status
+                  </label>
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as PostStatus)}
+                    className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+                  >
+                    {STATUS_ORDER.map((valor) => (
+                      <option key={valor} value={valor}>
+                        {STATUS_LABELS[valor]}
                       </option>
                     ))}
                   </select>
@@ -231,20 +253,6 @@ export function NewPostDialog({
 
               <div>
                 <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
-                  Legenda
-                </label>
-                <textarea
-                  value={legenda}
-                  onChange={(e) => setLegenda(e.target.value)}
-                  onPaste={(e) => handlePasteControlled(e, legenda, setLegenda)}
-                  rows={4}
-                  className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
-                  placeholder="Escreva a legenda do post..."
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
                   {rotuloRoteiro}
                 </label>
                 <textarea
@@ -254,6 +262,20 @@ export function NewPostDialog({
                   rows={8}
                   className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
                   placeholder={placeholderRoteiro}
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/60">
+                  Legenda
+                </label>
+                <textarea
+                  value={legenda}
+                  onChange={(e) => setLegenda(e.target.value)}
+                  onPaste={(e) => handlePasteControlled(e, legenda, setLegenda)}
+                  rows={4}
+                  className="w-full resize-y rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
+                  placeholder="Escreva a legenda do post..."
                 />
               </div>
 
