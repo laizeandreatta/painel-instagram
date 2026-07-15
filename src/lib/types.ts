@@ -16,6 +16,7 @@ export type Categoria =
   | "produto_promocional"
   | "marca_pessoal_branding"
   | "financas_femininas"
+  | "negocios_digitais"
   | "nostalgia_comunidade"
   | "relacionamentos_comportamento_social";
 
@@ -63,6 +64,7 @@ export type Post = {
   comentarios: Comentario[];
   criado_em: string;
   ig_media_id?: string | null;
+  ordem: number;
 };
 
 export type AnalisePost = {
@@ -150,6 +152,7 @@ export const CATEGORIA_LABELS: Record<Categoria, string> = {
   produto_promocional: "Produto & Promocional",
   marca_pessoal_branding: "Marca Pessoal & Branding",
   financas_femininas: "Finanças Femininas",
+  negocios_digitais: "Negócios Digitais",
   nostalgia_comunidade: "Nostalgia & Comunidade / Institucional",
   relacionamentos_comportamento_social: "Relacionamentos & Comportamento Social",
 };
@@ -163,6 +166,7 @@ export const CATEGORIA_ORDER: Categoria[] = [
   "produto_promocional",
   "marca_pessoal_branding",
   "financas_femininas",
+  "negocios_digitais",
   "nostalgia_comunidade",
   "relacionamentos_comportamento_social",
 ];
@@ -178,6 +182,7 @@ export const CATEGORIA_CORES: Record<Categoria, { bg: string; text: string }> = 
   produto_promocional: { bg: "#F7E3D3", text: "#8A4A1E" },
   marca_pessoal_branding: { bg: "#F1DCE0", text: "#7A3040" },
   financas_femininas: { bg: "#D9EEE9", text: "#1F6B58" },
+  negocios_digitais: { bg: "#E2E5F0", text: "#3A4470" },
   nostalgia_comunidade: { bg: "#F0E6D8", text: "#6B5535" },
   relacionamentos_comportamento_social: { bg: "#F5D9D4", text: "#8C3D2E" },
 };
