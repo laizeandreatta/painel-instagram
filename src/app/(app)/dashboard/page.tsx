@@ -10,7 +10,8 @@ import { NewPostDialog } from "@/components/NewPostDialog";
 import { useAuth } from "@/lib/useAuth";
 
 export default function DashboardPage() {
-  const { posts, atualizarStatus, criarPost, loading } = usePosts();
+  const { posts, atualizarStatus, criarPost, atualizarOrdem, loading } =
+    usePosts();
   const { profile } = useAuth();
   const [visao, setVisao] = useState<"kanban" | "tabela" | "calendario">(
     "kanban"
@@ -77,7 +78,7 @@ export default function DashboardPage() {
       ) : visao === "kanban" ? (
         <KanbanBoard posts={posts} onStatusChange={atualizarStatus} />
       ) : visao === "tabela" ? (
-        <TableView posts={posts} />
+        <TableView posts={posts} onReordenarPost={atualizarOrdem} />
       ) : (
         <CalendarView posts={posts} />
       )}
