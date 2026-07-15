@@ -30,6 +30,7 @@ export const MOCK_POSTS: Post[] = [
     artes: [],
     comentarios: [],
     criado_em: diasA(-3),
+    ordem: 1,
   },
   {
     id: "p2",
@@ -56,6 +57,7 @@ export const MOCK_POSTS: Post[] = [
       },
     ],
     criado_em: diasA(-5),
+    ordem: 2,
   },
   {
     id: "p3",
@@ -70,6 +72,7 @@ export const MOCK_POSTS: Post[] = [
     artes: [],
     comentarios: [],
     criado_em: diasA(-2),
+    ordem: 3,
   },
   {
     id: "p4",
@@ -84,6 +87,7 @@ export const MOCK_POSTS: Post[] = [
     artes: [],
     comentarios: [],
     criado_em: diasA(-6),
+    ordem: 4,
   },
   {
     id: "p5",
@@ -98,6 +102,7 @@ export const MOCK_POSTS: Post[] = [
     artes: [],
     comentarios: [],
     criado_em: diasA(-8),
+    ordem: 5,
   },
   {
     id: "p6",
@@ -112,6 +117,7 @@ export const MOCK_POSTS: Post[] = [
     artes: [],
     comentarios: [],
     criado_em: diasA(-10),
+    ordem: 6,
   },
 ];
 
