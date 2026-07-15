@@ -49,10 +49,13 @@ const COLUNAS: { chave: Coluna; label: string }[] = [
   { chave: "designer_nome", label: "Designer" },
 ];
 
-function celulas(post: Post) {
+function celulas(post: Post, posicao: number) {
   const cor = post.categoria ? CATEGORIA_CORES[post.categoria] : null;
   return (
     <>
+      <td className="whitespace-nowrap px-4 py-3 text-center tabular-nums text-ink/40">
+        {posicao}
+      </td>
       <td className="whitespace-nowrap px-4 py-3">
         <Link
           href={`/post/${post.id}`}
@@ -102,7 +105,7 @@ function celulas(post: Post) {
   );
 }
 
-function LinhaArrastavel({ post }: { post: Post }) {
+function LinhaArrastavel({ post, posicao }: { post: Post; posicao: number }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: post.id });
 
@@ -128,16 +131,16 @@ function LinhaArrastavel({ post }: { post: Post }) {
           <GripVertical size={15} />
         </button>
       </td>
-      {celulas(post)}
+      {celulas(post, posicao)}
     </tr>
   );
 }
 
-function LinhaEstatica({ post }: { post: Post }) {
+function LinhaEstatica({ post, posicao }: { post: Post; posicao: number }) {
   return (
     <tr className="border-b border-line last:border-b-0 hover:bg-baby-pink-light/40">
       <td className="px-3 py-3" />
-      {celulas(post)}
+      {celulas(post, posicao)}
     </tr>
   );
 }
@@ -262,16 +265,16 @@ export function TableView({
               strategy={verticalListSortingStrategy}
             >
               <tbody>
-                {postsOrdenados.map((post) => (
-                  <LinhaArrastavel key={post.id} post={post} />
+                {postsOrdenados.map((post, index) => (
+                  <LinhaArrastavel key={post.id} post={post} posicao={index + 1} />
                 ))}
               </tbody>
             </SortableContext>
           </DndContext>
         ) : (
           <tbody>
-            {postsOrdenados.map((post) => (
-              <LinhaEstatica key={post.id} post={post} />
+            {postsOrdenados.map((post, index) => (
+              <LinhaEstatica key={post.id} post={post} posicao={index + 1} />
             ))}
           </tbody>
         )}
