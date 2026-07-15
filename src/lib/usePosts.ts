@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient, isSupabaseConfigured } from "./supabase";
 import { MOCK_POSTS } from "./mockData";
 import { Comentario, Post, PostStatus } from "./types";
@@ -19,6 +19,14 @@ export function usePosts() {
   const [loading, setLoading] = useState(isSupabaseConfigured());
   const demoMode = !isSupabaseConfigured();
 
+  // Ref com o valor mais recente de `posts`, usada por callbacks memoizados
+  // (ex: criarPost) que precisam ler o estado atual sem depender dele no
+  // array de dependências do useCallback.
+  const postsRef = useRef<Post[]>(posts);
+  useEffect(() => {
+    postsRef.current = posts;
+  }, [posts]);
+
   const carregar = useCallback(async () => {
     if (!isSupabaseConfigured()) return;
     setLoading(true);
@@ -26,7 +34,7 @@ export function usePosts() {
     const { data: postsData } = await supabase
       .from("posts")
       .select("*")
-      .order("data_publicacao", { ascending: true });
+      .order("ordem", { ascending: true });
 
     const { data: artesData } = await supabase.from("artes").select("*");
     const { data: comentariosData } = await supabase
@@ -63,6 +71,11 @@ export function usePosts() {
 
   const criarPost = useCallback(async (novo: Partial<Post>) => {
     const id = `p-${Date.now()}`;
+    // Novos conteúdos sempre entram no fim da ordem manual.
+    const maiorOrdem = postsRef.current.reduce(
+      (max, p) => Math.max(max, p.ordem ?? 0),
+      0
+    );
     const post: Post = {
       id,
       titulo: novo.titulo ?? "Novo post",
@@ -78,6 +91,7 @@ export function usePosts() {
       artes: [],
       comentarios: [],
       criado_em: new Date().toISOString(),
+      ordem: maiorOrdem + 1,
     };
     setPosts((prev) => [...prev, post]);
 
@@ -93,6 +107,7 @@ export function usePosts() {
         tipo: post.tipo,
         status: post.status,
         data_publicacao: post.data_publicacao,
+        ordem: post.ordem,
       });
     }
     return post;
@@ -163,6 +178,20 @@ export function usePosts() {
     if (isSupabaseConfigured()) {
       const supabase = createClient();
       await supabase.from("artes").delete().eq("id", arteId);
+    }
+  }, []);
+
+  // Reordena os conteúdos manualmente (arrastar e soltar na Tabela). Usa
+  // indexação fracionária: a nova ordem fica entre os vizinhos da posição
+  // de destino, então só precisamos atualizar o item movido, não a lista
+  // inteira.
+  const atualizarOrdem = useCallback(async (postId: string, novaOrdem: number) => {
+    setPosts((prev) =>
+      prev.map((p) => (p.id === postId ? { ...p, ordem: novaOrdem } : p))
+    );
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      await supabase.from("posts").update({ ordem: novaOrdem }).eq("id", postId);
     }
   }, []);
 
@@ -243,6 +272,7 @@ export function usePosts() {
     adicionarComentario,
     adicionarArte,
     excluirArte,
+    atualizarOrdem,
     atualizarIgMediaId,
     atualizarRoteiro,
     atualizarCategoria,
