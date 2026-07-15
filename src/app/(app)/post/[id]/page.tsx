@@ -16,9 +16,11 @@ import {
   CATEGORIA_LABELS,
   CATEGORIA_ORDER,
   PostStatus,
+  PostType,
   STATUS_LABELS,
   STATUS_ORDER,
   TIPO_LABELS,
+  TIPO_ORDER,
 } from "@/lib/types";
 
 export default function PostDetalhePage() {
@@ -262,6 +264,27 @@ export default function PostDetalhePage() {
               }`}
             >
               {STATUS_LABELS[status as PostStatus]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-ink/50">
+          Alterar formato
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {TIPO_ORDER.map((tipo) => (
+            <button
+              key={tipo}
+              onClick={() => atualizarCampos(post.id, { tipo })}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                post.tipo === tipo
+                  ? "border-wine bg-wine text-off-white"
+                  : "border-line bg-white text-ink/60 hover:border-wine hover:text-wine"
+              }`}
+            >
+              {TIPO_LABELS[tipo as PostType]}
             </button>
           ))}
         </div>
