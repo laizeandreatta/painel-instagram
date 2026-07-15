@@ -7,6 +7,7 @@ import { KanbanBoard } from "@/components/KanbanBoard";
 import { CalendarView } from "@/components/CalendarView";
 import { TableView } from "@/components/TableView";
 import { NewPostDialog } from "@/components/NewPostDialog";
+import { EstatisticasPosts } from "@/components/EstatisticasPosts";
 import { useAuth } from "@/lib/useAuth";
 
 export default function DashboardPage() {
@@ -72,6 +73,8 @@ export default function DashboardPage() {
           />
         </div>
       </div>
+
+      {!loading && <EstatisticasPosts posts={posts} />}
 
       {loading ? (
         <p className="text-sm text-ink/50">Carregando conteúdos...</p>
