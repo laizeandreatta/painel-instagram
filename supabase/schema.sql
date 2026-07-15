@@ -32,6 +32,7 @@ create table if not exists posts (
     'produto_promocional',
     'marca_pessoal_branding',
     'financas_femininas',
+    'negocios_digitais',
     'nostalgia_comunidade',
     'relacionamentos_comportamento_social'
   )),
@@ -43,6 +44,7 @@ create table if not exists posts (
   designer_id uuid references perfis (id),
   designer_nome text,
   ig_media_id text,
+  ordem double precision not null default 0,
   criado_em timestamptz not null default now()
 );
 
@@ -329,3 +331,35 @@ create policy "equipe apaga artes" on artes for delete using (auth.role() = 'aut
 
 create policy "equipe apaga arquivos de artes" on storage.objects
   for delete using (bucket_id = 'artes' and auth.role() = 'authenticated');
+
+-- =========================================================================
+-- Migração: nova editoria "Negócios Digitais" + ordenação manual dos
+-- conteúdos (arrastar e soltar na Tabela).
+-- =========================================================================
+alter table posts drop constraint if exists posts_categoria_check;
+alter table posts add constraint posts_categoria_check check (categoria in (
+  'saude_mental_bem_estar',
+  'mentalidade_sucesso',
+  'autoridade_presenca_feminina',
+  'autoestima_autoconhecimento',
+  'carreira_posicionamento',
+  'produto_promocional',
+  'marca_pessoal_branding',
+  'financas_femininas',
+  'negocios_digitais',
+  'nostalgia_comunidade',
+  'relacionamentos_comportamento_social'
+));
+
+alter table posts add column if not exists ordem double precision not null default 0;
+
+-- Preenche a ordem dos conteúdos já existentes seguindo a data de
+-- publicação atual, para que a lista comece organizada do mesmo jeito
+-- que já estava.
+with numerados as (
+  select id, row_number() over (order by data_publicacao asc) as rn
+  from posts
+)
+update posts set ordem = numerados.rn
+from numerados
+where posts.id = numerados.id and posts.ordem = 0;
