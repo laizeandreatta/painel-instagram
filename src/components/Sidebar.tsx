@@ -25,10 +25,24 @@ const LINKS = [
   { href: "/analytics", label: "Desempenho", icon: LineChart },
 ];
 
+// O papel "designer" só cuida da parte visual do trabalho, então some com as
+// abas de negócio (CRM Assessoria e Desempenho) para esse papel.
+const LINKS_PERMITIDOS_DESIGNER = new Set([
+  "/dashboard",
+  "/feed",
+  "/fotos",
+  "/identidade-visual",
+]);
+
 export function Sidebar() {
   const pathname = usePathname();
   const { profile, demoMode } = useAuth();
   const router = useRouter();
+
+  const links =
+    profile?.papel === "designer"
+      ? LINKS.filter((link) => LINKS_PERMITIDOS_DESIGNER.has(link.href))
+      : LINKS;
 
   async function sair() {
     if (isSupabaseConfigured()) {
@@ -50,7 +64,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
-        {LINKS.map(({ href, label, icon: Icon }) => {
+        {links.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
           return (
             <Link
