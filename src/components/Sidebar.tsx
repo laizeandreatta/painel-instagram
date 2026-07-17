@@ -10,6 +10,7 @@ import {
   LineChart,
   LogOut,
   Palette,
+  Users,
 } from "lucide-react";
 import { useAuth } from "@/lib/useAuth";
 import { isSupabaseConfigured, createClient } from "@/lib/supabase";
@@ -18,6 +19,7 @@ import { useRouter } from "next/navigation";
 const LINKS = [
   { href: "/dashboard", label: "Calendário & Kanban", icon: KanbanSquare },
   { href: "/feed", label: "Feed", icon: LayoutGrid },
+  { href: "/crm-assessoria", label: "CRM Assessoria", icon: Users },
   { href: "/fotos", label: "Minhas fotos", icon: ImageIcon },
   { href: "/identidade-visual", label: "Identidade Visual", icon: Palette },
   { href: "/analytics", label: "Desempenho", icon: LineChart },
