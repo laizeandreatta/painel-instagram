@@ -17,7 +17,7 @@ import { isSupabaseConfigured, createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
 const LINKS = [
-  { href: "/dashboard", label: "Calendário & Kanban", icon: KanbanSquare },
+  { href: "/dashboard", label: "Conteúdos", icon: KanbanSquare },
   { href: "/feed", label: "Feed", icon: LayoutGrid },
   { href: "/crm-assessoria", label: "CRM Assessoria", icon: Users },
   { href: "/fotos", label: "Minhas fotos", icon: ImageIcon },
