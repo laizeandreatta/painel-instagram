@@ -21,6 +21,42 @@ export type Categoria =
   | "nostalgia_comunidade"
   | "relacionamentos_comportamento_social";
 
+// CRM Assessoria (Valore): leads captados pelo funil Instagram (bio) ->
+// site -> WhatsApp -> reunião com a Laize.
+export type LeadStatus =
+  | "novo"
+  | "conversa_iniciada"
+  | "reuniao_agendada"
+  | "proposta_enviada"
+  | "fechado"
+  | "perdido";
+
+export type LeadOrigem = "whatsapp" | "manual" | "site";
+
+export type LeadMensagem = {
+  id: string;
+  lead_id: string;
+  direcao: "recebida" | "enviada";
+  texto: string;
+  criado_em: string;
+};
+
+export type Lead = {
+  id: string;
+  nome: string;
+  telefone: string;
+  origem: LeadOrigem;
+  status: LeadStatus;
+  notas?: string | null;
+  responsavel_nome?: string | null;
+  valor_proposta?: number | null;
+  ultima_mensagem?: string | null;
+  ultima_mensagem_em?: string | null;
+  mensagens: LeadMensagem[];
+  criado_em: string;
+  atualizado_em: string;
+};
+
 export type Profile = {
   id: string;
   nome: string;
@@ -189,4 +225,37 @@ export const CATEGORIA_CORES: Record<Categoria, { bg: string; text: string }> = 
   marketing_conteudo: { bg: "#F6EFD0", text: "#8A6D12" },
   nostalgia_comunidade: { bg: "#F0E6D8", text: "#6B5535" },
   relacionamentos_comportamento_social: { bg: "#F5D9D4", text: "#8C3D2E" },
+};
+
+export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
+  novo: "Novo lead",
+  conversa_iniciada: "Conversa iniciada",
+  reuniao_agendada: "Reunião agendada",
+  proposta_enviada: "Proposta enviada",
+  fechado: "Fechado",
+  perdido: "Perdido",
+};
+
+export const LEAD_STATUS_ORDER: LeadStatus[] = [
+  "novo",
+  "conversa_iniciada",
+  "reuniao_agendada",
+  "proposta_enviada",
+  "fechado",
+  "perdido",
+];
+
+export const LEAD_STATUS_CORES: Record<LeadStatus, { bg: string; text: string }> = {
+  novo: { bg: "#E2E5F0", text: "#3A4470" },
+  conversa_iniciada: { bg: "#F4E9D8", text: "#7A5A24" },
+  reuniao_agendada: { bg: "#DCE7F0", text: "#2C4A66" },
+  proposta_enviada: { bg: "#F4DEE3", text: "#6D1F30" },
+  fechado: { bg: "#D9EEE9", text: "#1F6B58" },
+  perdido: { bg: "#F1E1E1", text: "#8C3D2E" },
+};
+
+export const LEAD_ORIGEM_LABELS: Record<LeadOrigem, string> = {
+  whatsapp: "WhatsApp",
+  manual: "Manual",
+  site: "Site",
 };
