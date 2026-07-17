@@ -1,4 +1,4 @@
-import { AnalisePost, Post, SeguidoresSnapshot } from "./types";
+import { AnalisePost, Lead, Post, SeguidoresSnapshot } from "./types";
 
 const hoje = new Date();
 function diasA (offset: number) {
@@ -141,6 +141,77 @@ export const MOCK_ANALISES: AnalisePost[] = [
     salvamentos: 205,
     alcance: 15600,
     impressoes: 19800,
+  },
+];
+
+export const MOCK_LEADS: Lead[] = [
+  {
+    id: "l1",
+    nome: "Camila Ferreira",
+    telefone: "+55 11 98888-1234",
+    origem: "whatsapp",
+    status: "conversa_iniciada",
+    notas: "",
+    responsavel_nome: "Laize",
+    valor_proposta: null,
+    ultima_mensagem: "Oi! Vi o story de vocês, queria saber mais sobre a assessoria.",
+    ultima_mensagem_em: diasA(0),
+    mensagens: [
+      {
+        id: "m1",
+        lead_id: "l1",
+        direcao: "recebida",
+        texto: "Oi! Vi o story de vocês, queria saber mais sobre a assessoria.",
+        criado_em: diasA(0),
+      },
+    ],
+    criado_em: diasA(0),
+    atualizado_em: diasA(0),
+  },
+  {
+    id: "l2",
+    nome: "Beatriz Souza",
+    telefone: "+55 21 97777-5678",
+    origem: "whatsapp",
+    status: "reuniao_agendada",
+    notas: "Reunião marcada para quinta às 15h.",
+    responsavel_nome: "Laize",
+    valor_proposta: null,
+    ultima_mensagem: "Perfeito, te vejo quinta então!",
+    ultima_mensagem_em: diasA(-1),
+    mensagens: [],
+    criado_em: diasA(-3),
+    atualizado_em: diasA(-1),
+  },
+  {
+    id: "l3",
+    nome: "Renata Alves",
+    telefone: "+55 41 96666-4321",
+    origem: "manual",
+    status: "proposta_enviada",
+    notas: "Enviada proposta do plano trimestral.",
+    responsavel_nome: "Laize",
+    valor_proposta: 4500,
+    ultima_mensagem: null,
+    ultima_mensagem_em: null,
+    mensagens: [],
+    criado_em: diasA(-6),
+    atualizado_em: diasA(-2),
+  },
+  {
+    id: "l4",
+    nome: "Juliana Prado",
+    telefone: "+55 31 95555-8765",
+    origem: "whatsapp",
+    status: "fechado",
+    notas: "Fechou o plano anual.",
+    responsavel_nome: "Laize",
+    valor_proposta: 12000,
+    ultima_mensagem: "Fechado, bora começar!",
+    ultima_mensagem_em: diasA(-8),
+    mensagens: [],
+    criado_em: diasA(-12),
+    atualizado_em: diasA(-8),
   },
 ];
 
