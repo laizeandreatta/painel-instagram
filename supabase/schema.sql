@@ -385,3 +385,53 @@ alter table posts add constraint posts_categoria_check check (categoria in (
   'nostalgia_comunidade',
   'relacionamentos_comportamento_social'
 ));
+
+-- =========================================================================
+-- CRM Assessoria (Valore): leads que chegam pelo funil Instagram (bio) ->
+-- site -> WhatsApp -> reunião com a Laize. Os leads podem ser criados
+-- manualmente pela equipe ou automaticamente pela rota
+-- /api/whatsapp/webhook, que recebe as mensagens do WhatsApp Business
+-- Platform (Meta) e usa a service role key (ignora RLS) para gravar aqui.
+-- =========================================================================
+create table if not exists leads_valore (
+  id text primary key,
+  nome text not null default 'Sem nome',
+  telefone text not null,
+  origem text not null default 'manual' check (origem in ('whatsapp', 'manual', 'site')),
+  status text not null default 'novo' check (status in (
+    'novo', 'conversa_iniciada', 'reuniao_agendada', 'proposta_enviada', 'fechado', 'perdido'
+  )),
+  notas text default '',
+  responsavel_nome text,
+  valor_proposta numeric,
+  ultima_mensagem text,
+  ultima_mensagem_em timestamptz,
+  criado_em timestamptz not null default now(),
+  atualizado_em timestamptz not null default now()
+);
+
+-- Histórico de mensagens trocadas pelo WhatsApp com cada lead (fica vazio
+-- para leads criados manualmente, sem integração).
+create table if not exists lead_mensagens (
+  id text primary key,
+  lead_id text not null references leads_valore (id) on delete cascade,
+  direcao text not null check (direcao in ('recebida', 'enviada')),
+  texto text not null,
+  criado_em timestamptz not null default now()
+);
+
+create unique index if not exists leads_valore_telefone_key on leads_valore (telefone);
+
+alter table leads_valore enable row level security;
+alter table lead_mensagens enable row level security;
+
+create policy "equipe le leads" on leads_valore for select using (auth.role() = 'authenticated');
+create policy "equipe cria leads" on leads_valore for insert with check (auth.role() = 'authenticated');
+create policy "equipe edita leads" on leads_valore for update using (auth.role() = 'authenticated');
+create policy "equipe apaga leads" on leads_valore for delete using (auth.role() = 'authenticated');
+
+create policy "equipe le mensagens" on lead_mensagens for select using (auth.role() = 'authenticated');
+
+-- Leads/mensagens vindos do WhatsApp são gravados pela rota
+-- /api/whatsapp/webhook usando a service role key (ignora RLS), por isso
+-- não existe policy de insert em lead_mensagens para usuários comuns.
