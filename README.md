@@ -133,12 +133,16 @@ junto com você quando chegar a hora — é mais fácil fazendo ao vivo.
 
 ## Passo 6 — WhatsApp automático de agendamento + verificação da consultoria marcada
 
+> **CRM Assessoria e CRM Consultoria são serviços diferentes**, cada um
+> com sua própria tabela e seu próprio funil de leads. Este passo é só
+> sobre o CRM Consultoria (vendas da Hubla).
+
 Quando uma venda da consultoria é confirmada na Hubla (veja a integração
 já ativa em `/api/hubla/webhook`), o painel manda pro comprador um
 WhatsApp com o link de agendamento
 (`https://calendar.app.google/zFyfAuddQbUd7wH76`) e depois confere
 sozinho, na sua agenda do Google, se a pessoa realmente marcou —
-atualizando o card do lead no CRM Assessoria automaticamente. São duas
+atualizando o card do lead no CRM Consultoria automaticamente. São duas
 partes independentes de configurar.
 
 ### 6.1 — Enviar o WhatsApp (WhatsApp Business Platform / Meta)
@@ -193,7 +197,7 @@ pra mandar o link na mão nesse meio tempo).
    (troque pelo domínio real do seu painel e pelo valor que você colocou em `CRON_SECRET`).
 8. Aceite a permissão (pode aparecer um aviso "o Google não verificou esse app" — é esperado, porque o app é seu; clique em "Avançado" → "Acessar [nome do app] (não seguro)" para prosseguir).
 9. Você cai numa página com o **refresh token** — copie e cole na variável `GOOGLE_REFRESH_TOKEN` na Vercel.
-10. Publique de novo no Vercel. Pronto: a partir daí, uma vez por dia (e também sempre que alguém clicar em "Verificar agendamentos" no CRM Assessoria), o painel confere sua agenda e marca automaticamente quem já agendou.
+10. Publique de novo no Vercel. Pronto: a partir daí, uma vez por dia (e também sempre que alguém clicar em "Verificar agendamentos" no CRM Consultoria), o painel confere sua agenda e marca automaticamente quem já agendou.
 
 Esse passo só precisa ser feito **uma vez**. Se um dia o token parar de
 funcionar (ex: você revogou o acesso sem querer), é só repetir os passos
