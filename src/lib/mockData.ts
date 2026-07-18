@@ -213,6 +213,21 @@ export const MOCK_LEADS: Lead[] = [
     criado_em: diasA(-12),
     atualizado_em: diasA(-8),
   },
+  {
+    id: "l5",
+    nome: "Patrícia Nogueira",
+    telefone: "+55 51 94444-2211",
+    origem: "hubla",
+    status: "fechado",
+    notas: "",
+    responsavel_nome: null,
+    valor_proposta: 6000,
+    ultima_mensagem: "Venda confirmada na Hubla — R$ 6.000,00.",
+    ultima_mensagem_em: diasA(-1),
+    mensagens: [],
+    criado_em: diasA(-1),
+    atualizado_em: diasA(-1),
+  },
 ];
 
 export const MOCK_SEGUIDORES: SeguidoresSnapshot[] = Array.from({ length: 14 }).map(
