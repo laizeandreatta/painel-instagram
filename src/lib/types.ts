@@ -21,8 +21,9 @@ export type Categoria =
   | "nostalgia_comunidade"
   | "relacionamentos_comportamento_social";
 
-// CRM Assessoria (Valore): leads captados pelo funil Instagram (bio) ->
-// site -> WhatsApp -> reunião com a Laize.
+// Funil compartilhado pelos dois CRMs (Assessoria e Consultoria — serviços
+// diferentes, cada um com sua própria tabela no banco, mas com o mesmo
+// formato de card/etapas).
 export type LeadStatus =
   | "novo"
   | "conversa_iniciada"
