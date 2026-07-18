@@ -45,6 +45,7 @@ export type Lead = {
   id: string;
   nome: string;
   telefone: string;
+  email?: string | null;
   origem: LeadOrigem;
   status: LeadStatus;
   notas?: string | null;
@@ -52,6 +53,11 @@ export type Lead = {
   valor_proposta?: number | null;
   ultima_mensagem?: string | null;
   ultima_mensagem_em?: string | null;
+  // Pós-venda (Hubla): quando o WhatsApp com o link de agendamento foi
+  // enviado, e quando a rota /api/calendar/sync detectou que a pessoa
+  // realmente marcou a consultoria na agenda do Google.
+  convite_agendamento_enviado_em?: string | null;
+  consultoria_agendada_em?: string | null;
   mensagens: LeadMensagem[];
   criado_em: string;
   atualizado_em: string;
