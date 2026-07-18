@@ -1,7 +1,7 @@
 import { createAdminClient } from "./supabaseAdmin";
 
 /**
- * Confere na agenda do Google se algum lead do CRM Assessoria marcou a
+ * Confere na agenda do Google se algum lead do CRM Consultoria marcou a
  * consultoria pelo link de agendamento (https://calendar.app.google/zFyfAuddQbUd7wH76).
  * Casa os compromissos pelo e-mail de quem agendou (a página de
  * agendamento do Google sempre pede e-mail antes de confirmar).
