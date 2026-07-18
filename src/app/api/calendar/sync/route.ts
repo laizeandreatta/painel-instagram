@@ -3,8 +3,9 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { sincronizarAgendamentos } from "@/lib/googleCalendar";
 
 /**
- * Confere a agenda do Google e marca no CRM Assessoria quem já agendou a
- * consultoria (veja src/lib/googleCalendar.ts para a lógica completa).
+  * Confere a agenda do Google e marca no CRM Consultoria (serviço diferente
+ * do CRM Assessoria) quem já agendou a consultoria (veja
+ * src/lib/googleCalendar.ts para a lógica completa).
  *
  * Duas formas de chamar essa rota:
  *
@@ -12,7 +13,7 @@ import { sincronizarAgendamentos } from "@/lib/googleCalendar";
  *     vercel.json), roda automaticamente uma vez por dia.
  *
  *  2. POST com o cabeçalho "Authorization: Bearer <token da sessão>" —
- *     usada pelo botão "Verificar agendamentos" no CRM Assessoria, pra
+ *     usada pelo botão "Verificar agendamentos" no CRM Consultoria, pra
  *     conferir na hora sem esperar o cron do dia seguinte. Só funciona
  *     pra quem já está logado no painel.
  */
