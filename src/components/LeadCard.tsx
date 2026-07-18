@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { MessageCircle, Phone, Trash2 } from "lucide-react";
+import { CalendarCheck2, MessageCircle, Phone, Send, Trash2 } from "lucide-react";
 import { LEAD_ORIGEM_LABELS, Lead } from "@/lib/types";
 
 // Normaliza o telefone para o formato aceito pelo link wa.me (só dígitos).
@@ -66,6 +66,21 @@ export function LeadCard({
           })}
         </p>
       )}
+
+      {lead.consultoria_agendada_em ? (
+        <p className="mb-2 flex items-center gap-1.5 rounded-lg bg-[#D9EEE9] px-2.5 py-1.5 text-[11px] font-medium text-[#1F6B58]">
+          <CalendarCheck2 size={13} className="shrink-0" />
+          Consultoria agendada para{" "}
+          {format(new Date(lead.consultoria_agendada_em), "dd/MM 'às' HH:mm", {
+            locale: ptBR,
+          })}
+        </p>
+      ) : lead.convite_agendamento_enviado_em ? (
+        <p className="mb-2 flex items-center gap-1.5 rounded-lg bg-off-white px-2.5 py-1.5 text-[11px] font-medium text-ink/50">
+          <Send size={13} className="shrink-0" />
+          Link de agendamento enviado por WhatsApp
+        </p>
+      ) : null}
 
       <div className="mt-3 flex items-center justify-between text-xs text-ink/45">
         <span>
