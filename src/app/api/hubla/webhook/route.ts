@@ -3,8 +3,9 @@ import { createAdminClient } from "@/lib/supabaseAdmin";
 import { enviarWhatsappAgendamento } from "@/lib/whatsapp";
 
 /**
- * Webhook da Hubla, usado pelo CRM Assessoria para alimentar automaticamente
- * um lead sempre que houver uma venda confirmada da consultoria
+  * Webhook da Hubla, usado pelo CRM Consultoria (serviço diferente do CRM
+ * Assessoria) para alimentar automaticamente um lead sempre que houver
+ * uma venda confirmada da consultoria
  * (https://app.hub.la/edit/sWUzrJ6JRzAXaRpF0WBM/offers).
  *
  * Além de criar/atualizar o lead como "fechado", essa rota manda pro
