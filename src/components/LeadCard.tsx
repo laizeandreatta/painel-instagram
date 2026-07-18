@@ -59,7 +59,7 @@ export function LeadCard({
 
       {typeof lead.valor_proposta === "number" && lead.valor_proposta > 0 && (
         <p className="mb-2 text-xs font-medium text-ink/70">
-          Proposta:{" "}
+          {lead.origem === "hubla" ? "Venda" : "Proposta"}:{" "}
           {lead.valor_proposta.toLocaleString("pt-BR", {
             style: "currency",
             currency: "BRL",
