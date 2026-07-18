@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabaseAdmin";
+import { enviarWhatsappAgendamento } from "@/lib/whatsapp";
 
 /**
  * Webhook da Hubla, usado pelo CRM Assessoria para alimentar automaticamente
  * um lead sempre que houver uma venda confirmada da consultoria
  * (https://app.hub.la/edit/sWUzrJ6JRzAXaRpF0WBM/offers).
+ *
+ * Além de criar/atualizar o lead como "fechado", essa rota manda pro
+ * comprador um WhatsApp com o link de agendamento da consultoria
+ * (link de agendamento: https://calendar.app.google/zFyfAuddQbUd7wH76,
+ * embutido no modelo de mensagem aprovado — veja src/lib/whatsapp.ts). A
+ * rota /api/calendar/sync confere depois, na agenda do Google, se a
+ * pessoa realmente marcou o horário.
  *
  * Configure em Hubla > Integrações > Webhook:
  *  - URL: https://painel-instagram.vercel.app/api/hubla/webhook
@@ -19,10 +27,16 @@ import { createAdminClient } from "@/lib/supabaseAdmin";
  *  - HUBLA_PRODUTO_ID (opcional): se quiser trocar o produto/oferta que
  *    dispara a criação do lead. Por padrão já usa o produto da consultoria
  *    (sWUzrJ6JRzAXaRpF0WBM).
+ *  - WHATSAPP_ACCESS_TOKEN / WHATSAPP_PHONE_NUMBER_ID / (opcional)
+ *    WHATSAPP_TEMPLATE_AGENDAMENTO: veja src/lib/whatsapp.ts. Se não
+ *    estiverem configuradas, o lead ainda é criado normalmente — só o
+ *    envio do WhatsApp fica pulado (e registrado no log do servidor).
  */
 
 const PRODUTO_CONSULTORIA_ID =
   process.env.HUBLA_PRODUTO_ID || "sWUzrJ6JRzAXaRpF0WBM";
+
+const LINK_AGENDAMENTO = "https://calendar.app.google/zFyfAuddQbUd7wH76";
 
 type PayloadHubla = {
   type: string;
@@ -80,6 +94,7 @@ export async function POST(request: NextRequest) {
       [payer.firstName, payer.lastName].filter(Boolean).join(" ") ||
       "Sem nome";
     const telefone = payer.phone ?? "";
+    const email = payer.email ?? null;
     const valor = evento.invoice.amount?.totalCents
       ? evento.invoice.amount.totalCents / 100
       : null;
@@ -112,6 +127,7 @@ export async function POST(request: NextRequest) {
         .from("leads_valore")
         .update({
           status: "fechado",
+          email,
           valor_proposta: valor,
           ultima_mensagem: textoVenda,
           ultima_mensagem_em: agora,
@@ -124,9 +140,9 @@ export async function POST(request: NextRequest) {
         id: leadId,
         nome,
         telefone: telefone || "não informado",
+        email,
         origem: "hubla",
         status: "fechado",
-        notas: payer.email ? `E-mail: ${payer.email}` : "",
         valor_proposta: valor,
         ultima_mensagem: textoVenda,
         ultima_mensagem_em: agora,
@@ -140,6 +156,32 @@ export async function POST(request: NextRequest) {
       direcao: "recebida",
       texto: textoVenda,
     });
+
+    // Manda o WhatsApp com o link de agendamento. Se as variáveis do
+    // WhatsApp não estiverem configuradas ainda, ou o envio falhar por
+    // qualquer motivo, não derruba o webhook — só registra no log e o
+    // lead fica criado normalmente (dá pra mandar o link na mão).
+    if (telefone) {
+      try {
+        await enviarWhatsappAgendamento({ telefone, nome });
+        const textoConvite = `Link de agendamento enviado por WhatsApp: ${LINK_AGENDAMENTO}`;
+        await supabase
+          .from("leads_valore")
+          .update({ convite_agendamento_enviado_em: agora })
+          .eq("id", leadId);
+        await supabase.from("lead_mensagens").insert({
+          id: `m-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          lead_id: leadId,
+          direcao: "enviada",
+          texto: textoConvite,
+        });
+      } catch (erroWhatsapp) {
+        console.error(
+          "Não foi possível enviar o WhatsApp de agendamento:",
+          erroWhatsapp
+        );
+      }
+    }
 
     return NextResponse.json({ ok: true, leadId });
   } catch (e) {
