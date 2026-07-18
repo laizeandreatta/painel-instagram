@@ -387,11 +387,12 @@ alter table posts add constraint posts_categoria_check check (categoria in (
 ));
 
 -- =========================================================================
--- CRM Assessoria (Valore): leads que chegam pelo funil Instagram (bio) ->
--- site -> WhatsApp -> reunião com a Laize. Os leads podem ser criados
--- manualmente pela equipe ou automaticamente pela rota
--- /api/whatsapp/webhook, que recebe as mensagens do WhatsApp Business
--- Platform (Meta) e usa a service role key (ignora RLS) para gravar aqui.
+-- CRM Consultoria (Valore): leads da consultoria vendida pela Hubla, do
+-- pagamento confirmado até a consultoria marcada com a Laize. Alimentado
+-- pela rota /api/hubla/webhook (venda confirmada) e conferido pela rota
+-- /api/calendar/sync (agendamento confirmado na agenda do Google). É um
+-- serviço diferente do CRM Assessoria (tabela leads_assessoria, mais
+-- abaixo) — não confundir os dois.
 -- =========================================================================
 create table if not exists leads_valore (
   id text primary key,
@@ -445,3 +446,56 @@ alter table leads_valore drop constraint if exists leads_valore_origem_check;
 alter table leads_valore add constraint leads_valore_origem_check check (origem in (
   'whatsapp', 'manual', 'site', 'hubla'
 ));
+
+
+-- =========================================================================
+-- CRM Assessoria: serviço diferente da Consultoria (tabela leads_valore,
+-- acima) — tem seu próprio funil, separado. Leads chegam manualmente pela
+-- equipe ou automaticamente pela rota /api/whatsapp/webhook (mensagens
+-- recebidas pelo WhatsApp Business Platform / Meta, link na bio do
+-- Instagram), que usa a service role key (ignora RLS) para gravar aqui.
+-- Não tem relação com a Hubla nem com o agendamento automático da
+-- consultoria - isso é exclusivo do CRM Consultoria.
+-- =========================================================================
+create table if not exists leads_assessoria (
+  id text primary key,
+  nome text not null default 'Sem nome',
+  telefone text not null,
+  email text,
+  origem text not null default 'manual' check (origem in ('whatsapp', 'manual', 'site')),
+  status text not null default 'novo' check (status in (
+    'novo', 'conversa_iniciada', 'reuniao_agendada', 'proposta_enviada', 'fechado', 'perdido'
+  )),
+  notas text default '',
+  responsavel_nome text,
+  valor_proposta numeric,
+  ultima_mensagem text,
+  ultima_mensagem_em timestamptz,
+  criado_em timestamptz not null default now(),
+  atualizado_em timestamptz not null default now()
+);
+
+create table if not exists lead_mensagens_assessoria (
+  id text primary key,
+  lead_id text not null references leads_assessoria (id) on delete cascade,
+  direcao text not null check (direcao in ('recebida', 'enviada')),
+  texto text not null,
+  criado_em timestamptz not null default now()
+);
+
+create unique index if not exists leads_assessoria_telefone_key on leads_assessoria (telefone);
+
+alter table leads_assessoria enable row level security;
+alter table lead_mensagens_assessoria enable row level security;
+
+create policy "equipe le leads assessoria" on leads_assessoria for select using (auth.role() = 'authenticated');
+create policy "equipe cria leads assessoria" on leads_assessoria for insert with check (auth.role() = 'authenticated');
+create policy "equipe edita leads assessoria" on leads_assessoria for update using (auth.role() = 'authenticated');
+create policy "equipe apaga leads assessoria" on leads_assessoria for delete using (auth.role() = 'authenticated');
+
+create policy "equipe le mensagens assessoria" on lead_mensagens_assessoria for select using (auth.role() = 'authenticated');
+
+-- Leads/mensagens vindos do WhatsApp são gravados pela rota
+-- /api/whatsapp/webhook usando a service role key (ignora RLS), por isso
+-- não existe policy de insert em lead_mensagens_assessoria para usuários
+-- comuns.
