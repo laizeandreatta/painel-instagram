@@ -1,14 +1,19 @@
 "use client";
 
+import { useState } from "react";
+import { CalendarCheck2, Loader2 } from "lucide-react";
 import { useLeads } from "@/lib/useLeads";
 import { useAuth } from "@/lib/useAuth";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase";
 import { LeadKanbanBoard } from "@/components/LeadKanbanBoard";
 import { NewLeadDialog } from "@/components/NewLeadDialog";
 import { LEAD_STATUS_LABELS, LEAD_STATUS_ORDER } from "@/lib/types";
 
 export default function CrmAssessoriaPage() {
-  const { leads, loading, criarLead, atualizarStatus, excluirLead } = useLeads();
+  const { leads, loading, criarLead, atualizarStatus, excluirLead, recarregar } =
+    useLeads();
   const { profile } = useAuth();
+  const [verificando, setVerificando] = useState(false);
 
   const total = leads.length;
   const fechados = leads.filter((l) => l.status === "fechado").length;
@@ -17,6 +22,42 @@ export default function CrmAssessoriaPage() {
     const confirmado = window.confirm("Excluir este lead? Não pode ser desfeito.");
     if (!confirmado) return;
     excluirLead(leadId);
+  }
+
+  // Confere na hora, na agenda do Google, se alguém marcou a consultoria
+  // pelo link de agendamento enviado no WhatsApp pós-venda (veja
+  // /api/calendar/sync). Além desse botão manual, a mesma checagem roda
+  // sozinha uma vez por dia (Vercel Cron).
+  async function verificarAgendamentos() {
+    if (!isSupabaseConfigured()) return;
+    setVerificando(true);
+    try {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const resp = await fetch("/api/calendar/sync", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session?.access_token ?? ""}` },
+      });
+      const json = await resp.json();
+      if (!resp.ok || !json.ok) {
+        window.alert(
+          `Não deu pra verificar agora: ${json.erro ?? "erro desconhecido"}. Confira se o Google Calendar já foi configurado (veja o README).`
+        );
+      } else if (json.leadsAtualizados > 0) {
+        window.alert(
+          `${json.leadsAtualizados} lead(s) marcados como "Consultoria agendada".`
+        );
+        recarregar();
+      } else {
+        window.alert("Nenhum agendamento novo encontrado por enquanto.");
+      }
+    } catch (e) {
+      window.alert(`Não deu pra verificar agora: ${String(e)}`);
+    } finally {
+      setVerificando(false);
+    }
   }
 
   return (
@@ -32,10 +73,25 @@ export default function CrmAssessoriaPage() {
           </p>
         </div>
 
-        <NewLeadDialog
-          responsavelPadrao={profile?.nome ?? ""}
-          onCreate={(dados) => criarLead(dados)}
-        />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={verificarAgendamentos}
+            disabled={verificando}
+            className="flex items-center gap-1.5 rounded-lg border border-line bg-white px-4 py-2 text-sm font-medium text-ink hover:border-wine hover:text-wine disabled:opacity-50"
+          >
+            {verificando ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <CalendarCheck2 size={16} />
+            )}
+            Verificar agendamentos
+          </button>
+
+          <NewLeadDialog
+            responsavelPadrao={profile?.nome ?? ""}
+            onCreate={(dados) => criarLead(dados)}
+          />
+        </div>
       </div>
 
       {!loading && total > 0 && (
