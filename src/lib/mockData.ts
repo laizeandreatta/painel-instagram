@@ -144,9 +144,11 @@ export const MOCK_ANALISES: AnalisePost[] = [
   },
 ];
 
-export const MOCK_LEADS: Lead[] = [
+// CRM Assessoria: leads do funil Instagram (bio) -> site -> WhatsApp ->
+// reunião com a Laize. Serviço diferente do CRM Consultoria (abaixo).
+export const MOCK_LEADS_ASSESSORIA: Lead[] = [
   {
-    id: "l1",
+    id: "a1",
     nome: "Camila Ferreira",
     telefone: "+55 11 98888-1234",
     origem: "whatsapp",
@@ -154,14 +156,14 @@ export const MOCK_LEADS: Lead[] = [
     notas: "",
     responsavel_nome: "Laize",
     valor_proposta: null,
-    ultima_mensagem: "Oi! Vi o story de vocês, queria saber mais sobre a assessoria.",
+    ultima_mensagem: "Oi! Vi o story de vocés, queria saber mais sobre a assessoria.",
     ultima_mensagem_em: diasA(0),
     mensagens: [
       {
         id: "m1",
-        lead_id: "l1",
+        lead_id: "a1",
         direcao: "recebida",
-        texto: "Oi! Vi o story de vocês, queria saber mais sobre a assessoria.",
+        texto: "Oi! Vi o story de vocés, queria saber mais sobre a assessoria.",
         criado_em: diasA(0),
       },
     ],
@@ -169,7 +171,7 @@ export const MOCK_LEADS: Lead[] = [
     atualizado_em: diasA(0),
   },
   {
-    id: "l2",
+    id: "a2",
     nome: "Beatriz Souza",
     telefone: "+55 21 97777-5678",
     origem: "whatsapp",
@@ -184,7 +186,7 @@ export const MOCK_LEADS: Lead[] = [
     atualizado_em: diasA(-1),
   },
   {
-    id: "l3",
+    id: "a3",
     nome: "Renata Alves",
     telefone: "+55 41 96666-4321",
     origem: "manual",
@@ -199,7 +201,7 @@ export const MOCK_LEADS: Lead[] = [
     atualizado_em: diasA(-2),
   },
   {
-    id: "l4",
+    id: "a4",
     nome: "Juliana Prado",
     telefone: "+55 31 95555-8765",
     origem: "whatsapp",
@@ -213,8 +215,14 @@ export const MOCK_LEADS: Lead[] = [
     criado_em: diasA(-12),
     atualizado_em: diasA(-8),
   },
+];
+
+// CRM Consultoria (Valore): leads da consultoria vendida pela Hubla, do
+// pagamento confirmado até a consultoria marcada na agenda do Google.
+// Serviço diferente do CRM Assessoria (acima).
+export const MOCK_LEADS_CONSULTORIA: Lead[] = [
   {
-    id: "l5",
+    id: "c1",
     nome: "Patrícia Nogueira",
     telefone: "+55 51 94444-2211",
     email: "patricia.nogueira@exemplo.com",
