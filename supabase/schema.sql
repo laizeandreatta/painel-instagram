@@ -397,7 +397,7 @@ create table if not exists leads_valore (
   id text primary key,
   nome text not null default 'Sem nome',
   telefone text not null,
-  origem text not null default 'manual' check (origem in ('whatsapp', 'manual', 'site')),
+  origem text not null default 'manual' check (origem in ('whatsapp', 'manual', 'site', 'hubla')),
   status text not null default 'novo' check (status in (
     'novo', 'conversa_iniciada', 'reuniao_agendada', 'proposta_enviada', 'fechado', 'perdido'
   )),
@@ -435,3 +435,13 @@ create policy "equipe le mensagens" on lead_mensagens for select using (auth.rol
 -- Leads/mensagens vindos do WhatsApp são gravados pela rota
 -- /api/whatsapp/webhook usando a service role key (ignora RLS), por isso
 -- não existe policy de insert em lead_mensagens para usuários comuns.
+
+-- =========================================================================
+-- Migração: nova origem "hubla" para leads_valore.origem — usada pela rota
+-- /api/hubla/webhook, que recebe o evento de venda confirmada da Hubla
+-- (produto da consultoria) e alimenta/atualiza o lead automaticamente.
+-- =========================================================================
+alter table leads_valore drop constraint if exists leads_valore_origem_check;
+alter table leads_valore add constraint leads_valore_origem_check check (origem in (
+  'whatsapp', 'manual', 'site', 'hubla'
+));
