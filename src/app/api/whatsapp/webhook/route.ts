@@ -3,8 +3,9 @@ import { createAdminClient } from "@/lib/supabaseAdmin";
 
 /**
  * Webhook do WhatsApp Business Platform (Meta), usado pelo CRM Assessoria
- * para mapear automaticamente os leads que chegam pelo WhatsApp (link na
- * bio do Instagram -> site -> WhatsApp -> conversa).
+ * (serviço diferente do CRM Consultoria) para mapear automaticamente os
+ * leads que chegam pelo WhatsApp (link na bio do Instagram -> site ->
+ * WhatsApp -> conversa).
  *
  * GET  — handshake de verificação exigido pela Meta ao cadastrar a URL do
  *        webhook no painel de desenvolvedores. A Meta chama esta rota com
@@ -14,9 +15,9 @@ import { createAdminClient } from "@/lib/supabaseAdmin";
  *
  * POST — recebe cada evento de mensagem em tempo real. Para cada mensagem
  *        nova, encontra (pelo telefone) ou cria um lead na tabela
- *        leads_valore com origem "whatsapp" e status inicial "novo", e
- *        grava o texto em lead_mensagens + atualiza a prévia da última
- *        mensagem no card do lead.
+ *        leads_assessoria com origem "whatsapp" e status inicial "novo", e
+ *        grava o texto em lead_mensagens_assessoria + atualiza a prévia da
+ *        última mensagem no card do lead.
  *
  * Requer as variáveis de ambiente:
  *  - WHATSAPP_VERIFY_TOKEN: senha escolhida por você, cadastrada também
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
           // Encontra o lead pelo telefone ou cria um novo (primeira
           // mensagem desse contato).
           const { data: leadExistente } = await supabase
-            .from("leads_valore")
+            .from("leads_assessoria")
             .select("id")
             .eq("telefone", telefone)
             .maybeSingle();
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
 
           if (!leadId) {
             leadId = `l-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-            await supabase.from("leads_valore").insert({
+            await supabase.from("leads_assessoria").insert({
               id: leadId,
               nome,
               telefone,
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
             });
           } else {
             await supabase
-              .from("leads_valore")
+              .from("leads_assessoria")
               .update({
                 ultima_mensagem: texto,
                 ultima_mensagem_em: agora,
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
               .eq("id", leadId);
           }
 
-          await supabase.from("lead_mensagens").insert({
+          await supabase.from("lead_mensagens_assessoria").insert({
             id: `m-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
             lead_id: leadId,
             direcao: "recebida",
