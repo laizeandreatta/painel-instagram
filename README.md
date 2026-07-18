@@ -131,6 +131,76 @@ junto com você quando chegar a hora — é mais fácil fazendo ao vivo.
 
 ---
 
+## Passo 6 — WhatsApp automático de agendamento + verificação da consultoria marcada
+
+Quando uma venda da consultoria é confirmada na Hubla (veja a integração
+já ativa em `/api/hubla/webhook`), o painel manda pro comprador um
+WhatsApp com o link de agendamento
+(`https://calendar.app.google/zFyfAuddQbUd7wH76`) e depois confere
+sozinho, na sua agenda do Google, se a pessoa realmente marcou —
+atualizando o card do lead no CRM Assessoria automaticamente. São duas
+partes independentes de configurar.
+
+### 6.1 — Enviar o WhatsApp (WhatsApp Business Platform / Meta)
+
+A rota `/api/whatsapp/webhook` já existe pra **receber** mensagens.
+Pra **enviar** — que é o que esse recurso precisa — é preciso um passo a
+mais: um número comercial e um "modelo de mensagem" aprovado pela Meta
+(toda mensagem que uma empresa manda primeiro, sem o cliente ter escrito
+antes, precisa ser um modelo pré-aprovado).
+
+1. Acesse [business.facebook.com](https://business.facebook.com) → **WhatsApp Manager**. Se você já configurou o webhook de recebimento numa sessão anterior, o número comercial já deve existir aqui — é só reaproveitar.
+2. Em **Configurações da API** (ou "API Setup"), copie o **ID do número de telefone** (Phone number ID) e gere um **token de acesso permanente** (token de sistema, não o temporário de 24h que aparece por padrão).
+3. Em **Gerenciador de modelos de mensagem** ("Message Templates"), clique em **Criar modelo**:
+   - Categoria: **Utilidade** (Utility) — é uma notificação pós-compra, não propaganda.
+   - Nome: `agendamento_consultoria` (se usar outro nome, preencha `WHATSAPP_TEMPLATE_AGENDAMENTO` com ele).
+   - Idioma: Português (BR).
+   - Corpo da mensagem (sugestão, pode ajustar o tom):
+     > Oi {{1}}! Sua consultoria com a Laize Andreatta está confirmada. Toque no botão abaixo para escolher o melhor dia e horário para a nossa conversa.
+   - Botão: tipo **Visitar site**, com a URL fixa `https://calendar.app.google/zFyfAuddQbUd7wH76`.
+   - Envie para aprovação — geralmente sai em poucos minutos, às vezes até 24h.
+4. Nas variáveis de ambiente (Vercel e `.env.local`), preencha:
+   ```
+   WHATSAPP_ACCESS_TOKEN=          (o token permanente do passo 2)
+   WHATSAPP_PHONE_NUMBER_ID=       (o ID do número do passo 2)
+   WHATSAPP_TEMPLATE_AGENDAMENTO=  (só se usou um nome diferente de "agendamento_consultoria")
+   ```
+5. Publique de novo no Vercel. A partir da próxima venda, o WhatsApp já sai sozinho.
+
+Enquanto o modelo não estiver aprovado, o lead continua sendo criado
+normalmente no CRM — só o envio automático do WhatsApp fica pulado (dá
+pra mandar o link na mão nesse meio tempo).
+
+### 6.2 — Verificar quem marcou a consultoria (Google Calendar)
+
+1. Acesse [console.cloud.google.com](https://console.cloud.google.com), crie um projeto (ou use um existente) e ative a **Google Calendar API** (menu "APIs e serviços" → "Biblioteca").
+2. Em **Tela de consentimento OAuth**, configure como "Externo", preencha o nome do app (ex: "Painel Laize") e o seu e-mail. Deixe o status como está.
+3. Em **Credenciais** → **Criar credenciais** → **ID do cliente OAuth**, tipo **Aplicativo da Web**. Em "URIs de redirecionamento autorizados", adicione:
+   ```
+   https://SEU-PAINEL.vercel.app/api/admin/google/callback
+   ```
+4. Copie o **ID do cliente** e a **Chave secreta do cliente** e preencha nas variáveis de ambiente:
+   ```
+   GOOGLE_CLIENT_ID=
+   GOOGLE_CLIENT_SECRET=
+   ```
+5. Publique no Vercel com essas duas variáveis já preenchidas (ainda sem o `GOOGLE_REFRESH_TOKEN`, esse vem no próximo passo).
+6. Volte na Tela de consentimento OAuth e, em **Status de publicação**, clique em **Publicar app** (deixa como "Em produção"). Isso evita ter que refazer a autorização a cada 7 dias.
+7. No navegador, **logada com a conta do Google dona da agenda** (a mesma que tem o link de agendamento configurado), acesse:
+   ```
+   https://SEU-PAINEL.vercel.app/api/admin/google/auth?secret=SEU_CRON_SECRET
+   ```
+   (troque pelo domínio real do seu painel e pelo valor que você colocou em `CRON_SECRET`).
+8. Aceite a permissão (pode aparecer um aviso "o Google não verificou esse app" — é esperado, porque o app é seu; clique em "Avançado" → "Acessar [nome do app] (não seguro)" para prosseguir).
+9. Você cai numa página com o **refresh token** — copie e cole na variável `GOOGLE_REFRESH_TOKEN` na Vercel.
+10. Publique de novo no Vercel. Pronto: a partir daí, uma vez por dia (e também sempre que alguém clicar em "Verificar agendamentos" no CRM Assessoria), o painel confere sua agenda e marca automaticamente quem já agendou.
+
+Esse passo só precisa ser feito **uma vez**. Se um dia o token parar de
+funcionar (ex: você revogou o acesso sem querer), é só repetir os passos
+7 a 10.
+
+---
+
 ## Visual
 
 Paleta: vinho, preto, off-white, rosa bebê e bordô, com tipografia
