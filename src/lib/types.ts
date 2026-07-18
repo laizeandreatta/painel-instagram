@@ -31,7 +31,7 @@ export type LeadStatus =
   | "fechado"
   | "perdido";
 
-export type LeadOrigem = "whatsapp" | "manual" | "site";
+export type LeadOrigem = "whatsapp" | "manual" | "site" | "hubla";
 
 export type LeadMensagem = {
   id: string;
@@ -258,4 +258,5 @@ export const LEAD_ORIGEM_LABELS: Record<LeadOrigem, string> = {
   whatsapp: "WhatsApp",
   manual: "Manual",
   site: "Site",
+  hubla: "Venda (Hubla)",
 };
