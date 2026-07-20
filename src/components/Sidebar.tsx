@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import {
   Briefcase,
+  GraduationCap,
   Image as ImageIcon,
   KanbanSquare,
   LayoutGrid,
@@ -20,20 +21,21 @@ import { useAuth } from "@/lib/useAuth";
 import { isSupabaseConfigured, createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
-// CRM Assessoria e CRM Consultoria são serviços diferentes, cada um com
-// seu próprio funil de leads — não confundir os dois.
+// CRM Assessoria, CRM Consultoria e CRM Programa Ascensão são serviços
+// diferentes, cada um com seu próprio funil de leads — não confundir.
 const LINKS = [
   { href: "/dashboard", label: "Conteúdos", icon: KanbanSquare },
   { href: "/feed", label: "Feed", icon: LayoutGrid },
   { href: "/crm-assessoria", label: "CRM Assessoria", icon: Briefcase },
   { href: "/crm-consultoria", label: "CRM Consultoria", icon: Users },
+  { href: "/crm-ascensao", label: "CRM Programa Ascensão", icon: GraduationCap },
   { href: "/fotos", label: "Minhas fotos", icon: ImageIcon },
   { href: "/identidade-visual", label: "Identidade Visual", icon: Palette },
   { href: "/analytics", label: "Desempenho", icon: LineChart },
 ];
 
 // O papel "designer" só cuida da parte visual do trabalho, então some com as
-// abas de negócio (os dois CRMs e Desempenho) para esse papel.
+// abas de negócio (os três CRMs e Desempenho) para esse papel.
 const LINKS_PERMITIDOS_DESIGNER = new Set([
   "/dashboard",
   "/feed",
