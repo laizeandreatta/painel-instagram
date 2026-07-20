@@ -1,12 +1,12 @@
 {
-  "crons": [
-    {
-      "path": "/api/instagram/sync?secret=SUBSTITUA_PELO_SEU_CRON_SECRET",
-      "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/calendar/sync?secret=SUBSTITUA_PELO_SEU_CRON_SECRET",
-      "schedule": "0 13 * * *"
-    }
-  ]
+    "crons": [
+          {
+                  "path": "/api/instagram/sync?secret=8f3a1c2d9b7e4f6a0d5c3b8e1f2a9d7c",
+                  "schedule": "0 12 * * *"
+          },
+          {
+                  "path": "/api/calendar/sync?secret=8f3a1c2d9b7e4f6a0d5c3b8e1f2a9d7c",
+                  "schedule": "0 13 * * *"
+          }
+    ]
 }
