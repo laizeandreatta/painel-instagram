@@ -30,7 +30,12 @@ export type LeadStatus =
   | "reuniao_agendada"
   | "proposta_enviada"
   | "fechado"
-  | "perdido";
+  | "perdido"
+    | "acesso_liberado"
+    | "onboarding_enviado"
+    | "em_acompanhamento"
+    | "concluido"
+    | "suporte_pos_entrega";
 
 export type LeadOrigem = "whatsapp" | "manual" | "site" | "hubla";
 
@@ -241,6 +246,11 @@ export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
   proposta_enviada: "Proposta enviada",
   fechado: "Fechado",
   perdido: "Perdido",
+  acesso_liberado: "Acesso liberado",
+  onboarding_enviado: "Onboarding enviado",
+  em_acompanhamento: "Em acompanhamento",
+  concluido: "Concluído",
+  suporte_pos_entrega: "Suporte pós-entrega",
 };
 
 export const LEAD_STATUS_ORDER: LeadStatus[] = [
@@ -252,6 +262,14 @@ export const LEAD_STATUS_ORDER: LeadStatus[] = [
   "perdido",
 ];
 
+export const ENTREGA_STATUS_ORDER: LeadStatus[] = [
+    "acesso_liberado",
+    "onboarding_enviado",
+    "em_acompanhamento",
+    "concluido",
+    "suporte_pos_entrega",
+  ];
+
 export const LEAD_STATUS_CORES: Record<LeadStatus, { bg: string; text: string }> = {
   novo: { bg: "#E2E5F0", text: "#3A4470" },
   conversa_iniciada: { bg: "#F4E9D8", text: "#7A5A24" },
@@ -259,6 +277,11 @@ export const LEAD_STATUS_CORES: Record<LeadStatus, { bg: string; text: string }>
   proposta_enviada: { bg: "#F4DEE3", text: "#6D1F30" },
   fechado: { bg: "#D9EEE9", text: "#1F6B58" },
   perdido: { bg: "#F1E1E1", text: "#8C3D2E" },
+  acesso_liberado: { bg: "#DCE7F0", text: "#2C4A66" },
+  onboarding_enviado: { bg: "#F4E9D8", text: "#7A5A24" },
+  em_acompanhamento: { bg: "#E2E5F0", text: "#3A4470" },
+  concluido: { bg: "#D9EEE9", text: "#1F6B58" },
+  suporte_pos_entrega: { bg: "#EAE3F4", text: "#55407A" },
 };
 
 export const LEAD_ORIGEM_LABELS: Record<LeadOrigem, string> = {
