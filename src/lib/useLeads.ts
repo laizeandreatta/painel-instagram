@@ -35,6 +35,12 @@ export const RECURSO_CONSULTORIA: RecursoLeads = {
   mockLeads: MOCK_LEADS_CONSULTORIA,
 };
 
+export const RECURSO_ASCENSAO: RecursoLeads = {
+    tabelaLeads: "leads_ascensao",
+    tabelaMensagens: "lead_mensagens_ascensao",
+    mockLeads: [],
+};
+
 export function useLeads(recurso: RecursoLeads) {
   const { tabelaLeads, tabelaMensagens, mockLeads } = recurso;
   const [leads, setLeads] = useState<Lead[]>(
