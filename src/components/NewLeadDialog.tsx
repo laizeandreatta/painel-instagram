@@ -8,15 +8,21 @@ import { useTeam } from "@/lib/useTeam";
 export function NewLeadDialog({
   onCreate,
   responsavelPadrao,
+  statusOrder = LEAD_STATUS_ORDER,
+  statusLabels = LEAD_STATUS_LABELS,
+  statusPadrao = "novo",
 }: {
   onCreate: (dados: Partial<Lead>) => void;
   responsavelPadrao?: string;
+  statusOrder?: LeadStatus[];
+  statusLabels?: Record<LeadStatus, string>;
+  statusPadrao?: LeadStatus;
 }) {
   const equipe = useTeam();
   const [aberto, setAberto] = useState(false);
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
-  const [status, setStatus] = useState<LeadStatus>("novo");
+  const [status, setStatus] = useState<LeadStatus>(statusPadrao);
   const [responsavel, setResponsavel] = useState(responsavelPadrao ?? "");
   const [notas, setNotas] = useState("");
 
@@ -33,7 +39,7 @@ export function NewLeadDialog({
     });
     setNome("");
     setTelefone("");
-    setStatus("novo");
+    setStatus(statusPadrao);
     setResponsavel(responsavelPadrao ?? "");
     setNotas("");
     setAberto(false);
@@ -103,9 +109,9 @@ export function NewLeadDialog({
                     onChange={(e) => setStatus(e.target.value as LeadStatus)}
                     className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-wine"
                   >
-                    {LEAD_STATUS_ORDER.map((valor) => (
+                    {statusOrder.map((valor) => (
                       <option key={valor} value={valor}>
-                        {LEAD_STATUS_LABELS[valor]}
+                        {statusLabels[valor]}
                       </option>
                     ))}
                   </select>
