@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/useAuth";
 
 // Páginas de negócio que o papel "designer" não deve acessar (mesmo
 // digitando a URL direto), já que a Sidebar já esconde os links pra ele.
-const ROTAS_BLOQUEADAS_DESIGNER = ["/crm-assessoria", "/crm-consultoria", "/analytics"];
+const ROTAS_BLOQUEADAS_DESIGNER = ["/crm-assessoria", "/crm-consultoria", "/crm-ascensao", "/analytics"];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { profile, loading, demoMode } = useAuth();
