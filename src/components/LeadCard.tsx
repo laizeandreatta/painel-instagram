@@ -75,6 +75,14 @@ export function LeadCard({
             locale: ptBR,
           })}
         </p>
+      ) : lead.reputacao_agendada_em ? (
+        <p className="mb-2 flex items-center gap-1.5 rounded-lg bg-[#D9EEE9] px-2.5 py-1.5 text-[11px] font-medium text-[#1F6B58]">
+          <CalendarCheck2 size={13} className="shrink-0" />
+          Reunião agendada para{" "}
+          {format(new Date(lead.reputacao_agendada_em), "dd/MM 'às' HH:mm", {
+            locale: ptBR,
+          })}
+        </p>
       ) : lead.convite_agendamento_enviado_em ? (
         <p className="mb-2 flex items-center gap-1.5 rounded-lg bg-off-white px-2.5 py-1.5 text-[11px] font-medium text-ink/50">
           <Send size={13} className="shrink-0" />
