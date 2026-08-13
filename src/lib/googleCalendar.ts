@@ -124,7 +124,10 @@ export async function sincronizarAgendamentos() {
         .is(recurso.campoAgendado, null);
 
       const mapa = new Map<string, { id: string; email: string }>();
-      for (const l of (leads ?? []) as { id: string; email: string | null }[]) {
+      for (const l of (leads ?? []) as unknown as {
+        id: string;
+        email: string | null;
+      }[]) {
         if (l.email) {
           mapa.set(String(l.email).toLowerCase().trim(), {
             id: l.id,
