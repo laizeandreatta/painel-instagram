@@ -123,14 +123,15 @@ export async function sincronizarAgendamentos() {
         .not("email", "is", null)
         .is(recurso.campoAgendado, null);
 
-      const mapa = new Map(
-        (leads ?? [])
-          .filter((l: Record<string, unknown>) => l.email)
-          .map((l: Record<string, unknown>) => [
-            String(l.email).toLowerCase().trim(),
-            l as { id: string; email: string },
-          ])
-      );
+      const mapa = new Map<string, { id: string; email: string }>();
+      for (const l of (leads ?? []) as { id: string; email: string | null }[]) {
+        if (l.email) {
+          mapa.set(String(l.email).toLowerCase().trim(), {
+            id: l.id,
+            email: l.email,
+          });
+        }
+      }
 
       return { recurso, mapa };
     })
