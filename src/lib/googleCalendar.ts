@@ -1,18 +1,21 @@
 import { createAdminClient } from "./supabaseAdmin";
 
 /**
- * Confere na agenda do Google se algum lead do CRM Consultoria marcou a
- * consultoria pelo link de agendamento (https://calendar.app.google/zFyfAuddQbUd7wH76).
- * Casa os compromissos pelo e-mail de quem agendou (a página de
- * agendamento do Google sempre pede e-mail antes de confirmar).
+ * Confere na agenda do Google se algum lead de um dos funis com
+ * agendamento (CRM Consultoria, CRM Reputação Digital) marcou a conversa
+ * pelo link de agendamento correspondente. Casa os compromissos pelo
+ * e-mail de quem agendou (a página de agendamento do Google sempre pede
+ * e-mail antes de confirmar) — cada funil é conferido contra a mesma
+ * agenda do Google, já que os dois links de agendamento (Consultoria e
+ * Reputação Digital) criam eventos na mesma agenda.
  *
  * Requer as variáveis de ambiente:
- *  - GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: credenciais do projeto no
- *    Google Cloud Console (tela "IDs do cliente OAuth 2.0").
- *  - GOOGLE_REFRESH_TOKEN: obtido uma única vez autorizando o painel a
- *    ler sua agenda — veja a rota /api/admin/google/auth e o README.
- *  - GOOGLE_CALENDAR_ID (opcional): qual agenda conferir. Por padrão usa
- *    "primary" (a agenda principal da conta que autorizou).
+ * - GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: credenciais do projeto no
+ *   Google Cloud Console (tela "IDs do cliente OAuth 2.0").
+ * - GOOGLE_REFRESH_TOKEN: obtido uma única vez autorizando o painel a
+ *   ler sua agenda — veja a rota /api/admin/google/auth e o README.
+ * - GOOGLE_CALENDAR_ID (opcional): qual agenda conferir. Por padrão usa
+ *   "primary" (a agenda principal da conta que autorizou).
  */
 
 async function obterAccessTokenGoogle(): Promise<string> {
@@ -74,6 +77,34 @@ async function listarProximosEventos(accessToken: string): Promise<EventoGoogle[
   return (json.items ?? []) as EventoGoogle[];
 }
 
+// Cada funil com agendamento entra aqui: tabela de leads, tabela de
+// mensagens, qual coluna marca "agendado" e o texto da mensagem
+// registrada quando o agendamento é confirmado. `novoStatus` (opcional)
+// também avança o card no quadro Kanban quando o agendamento é achado.
+type RecursoAgendamento = {
+  tabelaLeads: string;
+  tabelaMensagens: string;
+  campoAgendado: string;
+  textoMensagem: (dataFormatada: string) => string;
+  novoStatus?: string;
+};
+
+const RECURSOS_AGENDAMENTO: RecursoAgendamento[] = [
+  {
+    tabelaLeads: "leads_valore",
+    tabelaMensagens: "lead_mensagens",
+    campoAgendado: "consultoria_agendada_em",
+    textoMensagem: (data) => `Consultoria agendada na agenda para ${data}.`,
+  },
+  {
+    tabelaLeads: "leads_reputacao",
+    tabelaMensagens: "lead_mensagens_reputacao",
+    campoAgendado: "reputacao_agendada_em",
+    textoMensagem: (data) => `Reunião agendada na agenda para ${data}.`,
+    novoStatus: "reuniao_agendada",
+  },
+];
+
 export async function sincronizarAgendamentos() {
   const supabase = createAdminClient();
   const resultado = { eventosVistos: 0, leadsAtualizados: 0, erros: [] as string[] };
@@ -82,22 +113,27 @@ export async function sincronizarAgendamentos() {
   const eventos = await listarProximosEventos(accessToken);
   resultado.eventosVistos = eventos.length;
 
-  // Só nos interessam leads que já têm e-mail (veio da venda na Hubla) e
-  // que ainda não tiveram o agendamento confirmado.
-  const { data: leads } = await supabase
-    .from("leads_valore")
-    .select("id, email, consultoria_agendada_em")
-    .not("email", "is", null)
-    .is("consultoria_agendada_em", null);
+  // Para cada funil, monta um mapa e-mail -> lead (só os que ainda não
+  // têm o agendamento confirmado).
+  const mapasPorRecurso = await Promise.all(
+    RECURSOS_AGENDAMENTO.map(async (recurso) => {
+      const { data: leads } = await supabase
+        .from(recurso.tabelaLeads)
+        .select(`id, email, ${recurso.campoAgendado}`)
+        .not("email", "is", null)
+        .is(recurso.campoAgendado, null);
 
-  if (!leads || leads.length === 0) {
-    return resultado;
-  }
+      const mapa = new Map(
+        (leads ?? [])
+          .filter((l: Record<string, unknown>) => l.email)
+          .map((l: Record<string, unknown>) => [
+            String(l.email).toLowerCase().trim(),
+            l as { id: string; email: string },
+          ])
+      );
 
-  const leadsPorEmail = new Map(
-    leads
-      .filter((l) => l.email)
-      .map((l) => [String(l.email).toLowerCase().trim(), l])
+      return { recurso, mapa };
+    })
   );
 
   for (const evento of eventos) {
@@ -110,32 +146,39 @@ export async function sincronizarAgendamentos() {
       const email = participante.email?.toLowerCase().trim();
       if (!email) continue;
 
-      const lead = leadsPorEmail.get(email);
-      if (!lead) continue;
+      for (const { recurso, mapa } of mapasPorRecurso) {
+        const lead = mapa.get(email);
+        if (!lead) continue;
 
-      try {
-        const agora = new Date().toISOString();
-        await supabase
-          .from("leads_valore")
-          .update({ consultoria_agendada_em: inicio, atualizado_em: agora })
-          .eq("id", lead.id);
+        try {
+          const agora = new Date().toISOString();
+          const patch: Record<string, unknown> = {
+            [recurso.campoAgendado]: inicio,
+            atualizado_em: agora,
+          };
+          if (recurso.novoStatus) {
+            patch.status = recurso.novoStatus;
+          }
 
-        const dataFormatada = new Date(inicio).toLocaleString("pt-BR", {
-          dateStyle: "short",
-          timeStyle: "short",
-        });
-        await supabase.from("lead_mensagens").insert({
-          id: `m-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-          lead_id: lead.id,
-          direcao: "recebida",
-          texto: `Consultoria agendada na agenda para ${dataFormatada}.`,
-        });
+          await supabase.from(recurso.tabelaLeads).update(patch).eq("id", lead.id);
 
-        resultado.leadsAtualizados += 1;
-        // Evita processar o mesmo lead duas vezes nessa mesma execução.
-        leadsPorEmail.delete(email);
-      } catch (e) {
-        resultado.erros.push(`Lead ${lead.id}: ${String(e)}`);
+          const dataFormatada = new Date(inicio).toLocaleString("pt-BR", {
+            dateStyle: "short",
+            timeStyle: "short",
+          });
+          await supabase.from(recurso.tabelaMensagens).insert({
+            id: `m-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            lead_id: lead.id,
+            direcao: "recebida",
+            texto: recurso.textoMensagem(dataFormatada),
+          });
+
+          resultado.leadsAtualizados += 1;
+          // Evita processar o mesmo lead duas vezes nessa mesma execução.
+          mapa.delete(email);
+        } catch (e) {
+          resultado.erros.push(`Lead ${lead.id}: ${String(e)}`);
+        }
       }
     }
   }

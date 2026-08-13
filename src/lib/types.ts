@@ -21,9 +21,9 @@ export type Categoria =
   | "nostalgia_comunidade"
   | "relacionamentos_comportamento_social";
 
-// Funil compartilhado pelos dois CRMs (Assessoria e Consultoria — serviços
-// diferentes, cada um com sua própria tabela no banco, mas com o mesmo
-// formato de card/etapas).
+// Funil compartilhado pelos CRMs Assessoria, Consultoria e Reputação
+// Digital — serviços diferentes, cada um com sua própria tabela no banco,
+// mas com o mesmo formato de card/etapas.
 export type LeadStatus =
   | "novo"
   | "conversa_iniciada"
@@ -31,11 +31,11 @@ export type LeadStatus =
   | "proposta_enviada"
   | "fechado"
   | "perdido"
-    | "acesso_liberado"
-    | "onboarding_enviado"
-    | "em_acompanhamento"
-    | "concluido"
-    | "suporte_pos_entrega";
+  | "acesso_liberado"
+  | "onboarding_enviado"
+  | "em_acompanhamento"
+  | "concluido"
+  | "suporte_pos_entrega";
 
 export type LeadOrigem = "whatsapp" | "manual" | "site" | "hubla";
 
@@ -64,6 +64,10 @@ export type Lead = {
   // realmente marcou a consultoria na agenda do Google.
   convite_agendamento_enviado_em?: string | null;
   consultoria_agendada_em?: string | null;
+  // CRM Reputação Digital: quando a rota /api/calendar/sync detectou que
+  // a pessoa marcou a conversa na agenda do Google, pelo formulário de
+  // aplicação enviado no site.
+  reputacao_agendada_em?: string | null;
   mensagens: LeadMensagem[];
   criado_em: string;
   atualizado_em: string;
@@ -263,12 +267,12 @@ export const LEAD_STATUS_ORDER: LeadStatus[] = [
 ];
 
 export const ENTREGA_STATUS_ORDER: LeadStatus[] = [
-    "acesso_liberado",
-    "onboarding_enviado",
-    "em_acompanhamento",
-    "concluido",
-    "suporte_pos_entrega",
-  ];
+  "acesso_liberado",
+  "onboarding_enviado",
+  "em_acompanhamento",
+  "concluido",
+  "suporte_pos_entrega",
+];
 
 export const LEAD_STATUS_CORES: Record<LeadStatus, { bg: string; text: string }> = {
   novo: { bg: "#E2E5F0", text: "#3A4470" },
