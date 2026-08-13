@@ -6,16 +6,18 @@ import { MOCK_LEADS_ASSESSORIA, MOCK_LEADS_CONSULTORIA } from "./mockData";
 import { Lead, LeadStatus } from "./types";
 
 /**
- * Hook central de dados dos CRMs de leads. É usado tanto pelo CRM
- * Assessoria quanto pelo CRM Consultoria — são serviços diferentes, cada
- * um com sua própria tabela no Supabase, mas com o mesmo funil/formato de
- * card, então o hook recebe qual "recurso" (tabelas + dados de demo) usar.
+ * Hook central de dados dos CRMs de leads. É usado pelos CRMs Assessoria,
+ * Consultoria, Programa Ascensão e Reputação Digital — são serviços
+ * diferentes, cada um com sua própria tabela no Supabase, mas com o mesmo
+ * funil/formato de card, então o hook recebe qual "recurso" (tabelas +
+ * dados de demo) usar.
  *
  * Em "modo demo" os dados vivem em memória; assim que o Supabase estiver
  * configurado, lê e grava na tabela indicada em `recurso` (compartilhada
  * com toda a equipe). Os leads também podem chegar automaticamente por
- * rotas de webhook (veja /api/whatsapp/webhook e /api/hubla/webhook), que
- * usam a service role key para gravar direto no banco.
+ * rotas de webhook (veja /api/whatsapp/webhook, /api/hubla/webhook e
+ * /api/reputacao/aplicacao), que usam a service role key para gravar
+ * direto no banco.
  */
 export type RecursoLeads = {
   tabelaLeads: string;
@@ -36,9 +38,15 @@ export const RECURSO_CONSULTORIA: RecursoLeads = {
 };
 
 export const RECURSO_ASCENSAO: RecursoLeads = {
-    tabelaLeads: "leads_ascensao",
-    tabelaMensagens: "lead_mensagens_ascensao",
-    mockLeads: [],
+  tabelaLeads: "leads_ascensao",
+  tabelaMensagens: "lead_mensagens_ascensao",
+  mockLeads: [],
+};
+
+export const RECURSO_REPUTACAO: RecursoLeads = {
+  tabelaLeads: "leads_reputacao",
+  tabelaMensagens: "lead_mensagens_reputacao",
+  mockLeads: [],
 };
 
 export function useLeads(recurso: RecursoLeads) {
