@@ -15,6 +15,10 @@ const ROTAS_BLOQUEADAS_DESIGNER = [
   "/analytics",
 ];
 
+// O papel "cliente" só pode acessar o próprio Posicionamento de Valor —
+// mesmo digitando outra URL direto, é redirecionado pra lá.
+const ROTA_UNICA_CLIENTE = "/posicionamento";
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { profile, loading, demoMode } = useAuth();
   const router = useRouter();
@@ -35,6 +39,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, [profile, pathname, router]);
 
+  useEffect(() => {
+    if (profile?.papel === "cliente" && !pathname.startsWith(ROTA_UNICA_CLIENTE)) {
+      router.replace(ROTA_UNICA_CLIENTE);
+    }
+  }, [profile, pathname, router]);
+
   if (!demoMode && loading) {
     return (
       <div className="flex flex-1 items-center justify-center text-ink/50">
@@ -51,6 +61,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     profile?.papel === "designer" &&
     ROTAS_BLOQUEADAS_DESIGNER.some((rota) => pathname.startsWith(rota))
   ) {
+    return null;
+  }
+
+  if (profile?.papel === "cliente" && !pathname.startsWith(ROTA_UNICA_CLIENTE)) {
     return null;
   }
 

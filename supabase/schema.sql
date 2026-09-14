@@ -499,3 +499,83 @@ create policy "equipe le mensagens assessoria" on lead_mensagens_assessoria for 
 -- /api/whatsapp/webhook usando a service role key (ignora RLS), por isso
 -- não existe policy de insert em lead_mensagens_assessoria para usuários
 -- comuns.
+
+-- =========================================================================
+-- Posicionamento de Valor — dossiê de posicionamento por cliente
+-- =========================================================================
+-- Se você está rodando este schema.sql pela primeira vez (painel novo),
+-- este bloco já cria tudo. Se o painel já estava no ar antes desse
+-- recurso existir, rode só o supabase/migration-posicionamento.sql (tem
+-- o mesmo conteúdo deste bloco) em vez de rodar este arquivo inteiro de
+-- novo — os "create policy" acima dariam erro de duplicado.
+
+alter table perfis drop constraint if exists perfis_papel_check;
+alter table perfis add constraint perfis_papel_check
+  check (papel in ('admin', 'designer', 'editor', 'social_media', 'cliente'));
+
+create table if not exists posicionamento_clientes (
+  id uuid primary key default gen_random_uuid(),
+  nome text not null,
+  slug text not null default '',
+  transcricao_bruta text not null default '',
+  gerado_em timestamptz,
+  modulos jsonb not null default '{}'::jsonb,
+  cliente_user_id uuid references auth.users (id) on delete set null,
+  criado_em timestamptz not null default now(),
+  atualizado_em timestamptz not null default now()
+);
+
+create table if not exists posicionamento_conteudos (
+  id uuid primary key default gen_random_uuid(),
+  cliente_id uuid not null references posicionamento_clientes (id) on delete cascade,
+  titulo text not null default '',
+  data date,
+  editoria text not null default '',
+  descricao text not null default '',
+  status text not null default 'ideia' check (status in ('ideia', 'producao', 'agendado', 'publicado')),
+  criado_em timestamptz not null default now()
+);
+
+alter table posicionamento_clientes enable row level security;
+alter table posicionamento_conteudos enable row level security;
+
+create or replace function is_equipe_posicionamento()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from perfis
+    where id = auth.uid() and papel <> 'cliente'
+  );
+$$;
+
+create policy "equipe le clientes posicionamento" on posicionamento_clientes
+  for select using (is_equipe_posicionamento());
+create policy "equipe cria clientes posicionamento" on posicionamento_clientes
+  for insert with check (is_equipe_posicionamento());
+create policy "equipe edita clientes posicionamento" on posicionamento_clientes
+  for update using (is_equipe_posicionamento());
+create policy "equipe apaga clientes posicionamento" on posicionamento_clientes
+  for delete using (is_equipe_posicionamento());
+create policy "cliente le proprio posicionamento" on posicionamento_clientes
+  for select using (cliente_user_id = auth.uid());
+
+create policy "equipe le conteudos posicionamento" on posicionamento_conteudos
+  for select using (is_equipe_posicionamento());
+create policy "equipe cria conteudos posicionamento" on posicionamento_conteudos
+  for insert with check (is_equipe_posicionamento());
+create policy "equipe edita conteudos posicionamento" on posicionamento_conteudos
+  for update using (is_equipe_posicionamento());
+create policy "equipe apaga conteudos posicionamento" on posicionamento_conteudos
+  for delete using (is_equipe_posicionamento());
+create policy "cliente le proprios conteudos" on posicionamento_conteudos
+  for select using (
+    exists (
+      select 1 from posicionamento_clientes c
+      where c.id = posicionamento_conteudos.cliente_id
+        and c.cliente_user_id = auth.uid()
+    )
+  );

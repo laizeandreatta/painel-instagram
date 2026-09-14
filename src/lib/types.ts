@@ -77,8 +77,46 @@ export type Profile = {
   id: string;
   nome: string;
   email: string;
-  papel: "admin" | "designer" | "editor" | "social_media";
+  // "cliente" é um papel à parte: login de um cliente do Posicionamento
+  // de Valor, sem acesso a mais nada do painel além do próprio dossiê.
+  papel: "admin" | "designer" | "editor" | "social_media" | "cliente";
   avatar_url?: string | null;
+};
+
+// ---------------------------------------------------------------------
+// Posicionamento de Valor
+// ---------------------------------------------------------------------
+
+export type PosicionamentoModuloDados = {
+  declaracao: string;
+  respostas: string[];
+};
+
+export type PosicionamentoModulos = Record<string, PosicionamentoModuloDados>;
+
+export type PosicionamentoCliente = {
+  id: string;
+  nome: string;
+  slug: string;
+  transcricao_bruta: string;
+  gerado_em: string | null;
+  modulos: PosicionamentoModulos;
+  cliente_user_id: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type PosicionamentoConteudoStatus = "ideia" | "producao" | "agendado" | "publicado";
+
+export type PosicionamentoConteudo = {
+  id: string;
+  cliente_id: string;
+  titulo: string;
+  data: string | null;
+  editoria: string;
+  descricao: string;
+  status: PosicionamentoConteudoStatus;
+  criado_em: string;
 };
 
 export type Comentario = {

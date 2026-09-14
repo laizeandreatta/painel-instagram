@@ -131,6 +131,31 @@ junto com você quando chegar a hora — é mais fácil fazendo ao vivo.
 
 ---
 
+## Passo 5.5 — Posicionamento de Valor (dossiê por cliente, com acesso do cliente)
+
+Aba nova no painel: dossiê de posicionamento de 12 módulos por cliente,
+gerado por IA a partir da transcrição da reunião de descoberta, com
+calendário de conteúdo próprio. Cada cliente pode ganhar um login que só
+enxerga o próprio dossiê — só visualiza e copia, não edita nada.
+
+1. No SQL Editor do Supabase, rode o arquivo `supabase/migration-posicionamento.sql` (inteiro, uma vez só). Se este for um painel novo que você ainda não rodou o `schema.sql`, pode ignorar este passo — o `schema.sql` já inclui tudo.
+2. Crie uma chave em [console.anthropic.com](https://console.anthropic.com) → **Settings → API Keys → Create Key**. É uma API paga (cobrada por uso, mas o custo por geração de dossiê é pequeno) — diferente da sua assinatura do Claude.ai.
+3. Nas variáveis de ambiente (`.env.local` e Vercel), preencha:
+   ```
+   ANTHROPIC_API_KEY=            (a chave do passo 2)
+   ```
+4. Publique de novo no Vercel (se já estiver no ar) ou rode `npm run dev`.
+
+**Como usar:** na aba "Posicionamento de Valor", crie um cliente, cole a
+transcrição da reunião na aba "Diagnóstico" e clique em "Gerar com IA".
+Revise o resultado na aba "Painel Estratégico" (dá pra editar cada
+módulo à mão). Planeje o calendário de conteúdo na aba "Conteúdos". Na
+aba "Acesso do cliente", crie um e-mail e senha para aquele cliente — a
+partir daí ele entra pelo `/login` normal do painel e só vê o próprio
+dossiê.
+
+---
+
 ## Passo 6 — WhatsApp automático de agendamento + verificação da consultoria marcada
 
 > **CRM Assessoria e CRM Consultoria são serviços diferentes**, cada um
