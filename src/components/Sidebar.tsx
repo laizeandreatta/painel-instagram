@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import {
   Briefcase,
+  Compass,
   GraduationCap,
   Image as ImageIcon,
   KanbanSquare,
@@ -32,6 +33,7 @@ const LINKS = [
   { href: "/crm-consultoria", label: "CRM Consultoria", icon: Users },
   { href: "/crm-ascensao", label: "CRM Programa Ascensão", icon: GraduationCap },
   { href: "/crm-reputacao", label: "CRM Reputação Digital", icon: Megaphone },
+  { href: "/posicionamento", label: "Posicionamento de Valor", icon: Compass },
   { href: "/fotos", label: "Minhas fotos", icon: ImageIcon },
   { href: "/identidade-visual", label: "Identidade Visual", icon: Palette },
   { href: "/analytics", label: "Desempenho", icon: LineChart },
@@ -45,6 +47,10 @@ const LINKS_PERMITIDOS_DESIGNER = new Set([
   "/fotos",
   "/identidade-visual",
 ]);
+
+// O papel "cliente" é o login de um cliente do Posicionamento de Valor:
+// só enxerga o próprio dossiê, nada mais do painel.
+const LINKS_CLIENTE = [{ href: "/posicionamento", label: "Posicionamento de Valor", icon: Compass }];
 
 function NavLinks({
   links,
@@ -87,7 +93,9 @@ export function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const links =
-    profile?.papel === "designer"
+    profile?.papel === "cliente"
+      ? LINKS_CLIENTE
+      : profile?.papel === "designer"
       ? LINKS.filter((link) => LINKS_PERMITIDOS_DESIGNER.has(link.href))
       : LINKS;
 
